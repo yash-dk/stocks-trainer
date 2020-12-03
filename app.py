@@ -117,6 +117,49 @@ class App(tk.Frame):
                  ).grid(row=3, column=1,  columnspan=3, sticky="nsew",
                         padx=5, pady=5)
 
+        tab2.grid_columnconfigure(1, weight=1)
+        tk.Label(tab2,
+                 text="LIMIT ORDER",
+                 font=self.font_small
+                 ).grid(row=0, column=0,  columnspan=4, sticky="nsew",
+                        padx=5, pady=5)
+
+        tk.Label(tab2,
+                 text="Order Price"
+                 ).grid(row=1, column=0,  columnspan=1, sticky="nsew",
+                        padx=5, pady=5)
+
+        tk.Entry(tab2
+                 ).grid(row=1, column=1,  columnspan=3, sticky="nsew",
+                        padx=5, pady=5)
+
+        tk.Label(tab2,
+                 text="Quantity"
+                 ).grid(row=2, column=0,  columnspan=1, sticky="nsew",
+                        padx=5, pady=5)
+
+        tk.Entry(tab2
+                 ).grid(row=2, column=1,  columnspan=3, sticky="nsew",
+                        padx=5, pady=5)
+
+        tk.Label(tab2,
+                 text="Take Profit"
+                 ).grid(row=3, column=0,  columnspan=1, sticky="nsew",
+                        padx=5, pady=5)
+
+        tk.Entry(tab2
+                 ).grid(row=3, column=1,  columnspan=3, sticky="nsew",
+                        padx=5, pady=5)
+
+        tk.Label(tab2,
+                 text="Stop Loss"
+                 ).grid(row=4, column=0,  columnspan=1, sticky="nsew",
+                        padx=5, pady=5)
+
+        tk.Entry(tab2
+                 ).grid(row=4, column=1,  columnspan=3, sticky="nsew",
+                        padx=5, pady=5)
+
         tk.Button(self,
                   text="Place Order"
                   ).grid(row=10, column=0, columnspan=4, sticky="nsew",
