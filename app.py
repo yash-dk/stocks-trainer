@@ -29,7 +29,7 @@ class App(tk.Frame):
 
     def construct_widget(self):
         tk.Label(self,
-                 text="BITCOI",
+                 text="BITCOIN",
                  font=self.font_normal,
                  width=15
                  ).grid(row=0, column=0, columnspan=4, sticky="nsew",
@@ -77,12 +77,30 @@ class App(tk.Frame):
         ttk.Separator(self
                       ).grid(row=7, column=0, columnspan=4, sticky="nsew")
 
+        ttk.Label(self,
+                  text="open\n15.12"
+                  ).grid(row=8, column=0, columnspan=1, sticky="nsew")
+
+        ttk.Label(self,
+                  text="close\n15.10"
+                  ).grid(row=8, column=1, columnspan=1, sticky="nsew")
+
+        ttk.Label(self,
+                  text="high\n16.10"
+                  ).grid(row=8, column=2, columnspan=1, sticky="nsew")
+
+        ttk.Label(self,
+                  text="low\n10.25"
+                  ).grid(row=8, column=3, columnspan=1, sticky="nsew")
+
+        ttk.Separator(self).grid(row=9, column=0, columnspan=4, sticky="nsew")
+
         tabscon = ttk.Notebook(self)
         tab1 = ttk.Frame(tabscon)
         tab2 = ttk.Frame(tabscon)
         tabscon.add(tab1, text="Market")
         tabscon.add(tab2, text="Limit")
-        tabscon.grid(row=8, column=0, columnspan=4, sticky="nsew")
+        tabscon.grid(row=10, column=0, columnspan=4, sticky="nsew")
         tab1.grid_columnconfigure(1, weight=1)
         tk.Label(tab1,
                  text="MARKET ORDER",
@@ -162,7 +180,7 @@ class App(tk.Frame):
 
         tk.Button(self,
                   text="Place Order"
-                  ).grid(row=10, column=0, columnspan=4, sticky="nsew",
+                  ).grid(row=11, column=0, columnspan=4, sticky="nsew",
                          padx=5, pady=5)
 
 
