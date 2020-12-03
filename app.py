@@ -32,81 +32,94 @@ class App(tk.Frame):
 
     def construct_widget(self):
         # Main GUI
+        rowcount = 0
 
         # Symbol
         tk.Label(self,
                  text="BITCOIN",
                  font=self.font_normal,
                  width=15
-                 ).grid(row=0, column=0, columnspan=4, sticky="nsew",
+                 ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew",
                         padx=5, pady=5)
+        rowcount += 1
 
         # Symbol Full Name
         tk.Label(self,
                  text="BITCOIN PTV. LTD."
-                 ).grid(row=1, column=0, columnspan=4, sticky="nsew")
+                 ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
+        rowcount += 1
 
-        ttk.Separator(self).grid(row=2, column=0, columnspan=4, sticky="nsew")
+        ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
+                                 sticky="nsew")
+        rowcount += 1
 
         # Buy Button
         tk.Button(self,
                   text="BUY\n$2020",
                   font=self.font_small
-                  ).grid(row=3, column=0, columnspan=2, sticky="nsew",
+                  ).grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
 
         # Sell Button
         tk.Button(self,
                   text="SELL\n$2020",
                   font=self.font_small
-                  ).grid(row=3, column=2, columnspan=2, sticky="nsew",
+                  ).grid(row=rowcount, column=2, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
+        rowcount += 1
 
-        ttk.Separator(self
-                      ).grid(row=4, column=0, columnspan=4, sticky="nsew")
+        ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
+                                 sticky="nsew")
+        rowcount += 1
 
         # Initialize replay
         tk.Button(self,
                   text="◀◀",
                   font=self.font_small
-                  ).grid(row=5, column=0, columnspan=4, sticky="nsew",
+                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew",
                          padx=5, pady=5)
+        rowcount += 1
 
         # Play / Pause the replay
         tk.Button(self,
                   text="▶",
                   font=self.font_small
-                  ).grid(row=6, column=0, columnspan=2, sticky="nsew",
+                  ).grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
 
         # Advance the bar by one
         tk.Button(self,
                   text="⏯",
                   font=self.font_small
-                  ).grid(row=6, column=2,  columnspan=2, sticky="nsew",
+                  ).grid(row=rowcount, column=2,  columnspan=2, sticky="nsew",
                          padx=5, pady=5)
+        rowcount += 1
 
-        ttk.Separator(self
-                      ).grid(row=7, column=0, columnspan=4, sticky="nsew")
+        ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
+                                 sticky="nsew")
+        rowcount += 1
 
         # OHLC Data of surrent candle
         ttk.Label(self,
                   text="open\n15.12"
-                  ).grid(row=8, column=0, columnspan=1, sticky="nsew")
+                  ).grid(row=rowcount, column=0, columnspan=1, sticky="nsew")
 
         ttk.Label(self,
                   text="close\n15.10"
-                  ).grid(row=8, column=1, columnspan=1, sticky="nsew")
+                  ).grid(row=rowcount, column=1, columnspan=1, sticky="nsew")
 
         ttk.Label(self,
                   text="high\n16.10"
-                  ).grid(row=8, column=2, columnspan=1, sticky="nsew")
+                  ).grid(row=rowcount, column=2, columnspan=1, sticky="nsew")
 
         ttk.Label(self,
                   text="low\n10.25"
-                  ).grid(row=8, column=3, columnspan=1, sticky="nsew")
+                  ).grid(row=rowcount, column=3, columnspan=1, sticky="nsew")
+        rowcount += 1
 
-        ttk.Separator(self).grid(row=9, column=0, columnspan=4, sticky="nsew")
+        ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
+                                 sticky="nsew")
+        rowcount += 1
 
         # Limit order and Market Order Tabs
         orderstab = ttk.Notebook(self)
@@ -120,7 +133,8 @@ class App(tk.Frame):
         orderstab.add(limittab, text="Limit")
 
         # Add tabs to main GUI
-        orderstab.grid(row=10, column=0, columnspan=4, sticky="nsew")
+        orderstab.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
+        rowcount += 1
 
         # Configure Market Tab
         markettab.grid_columnconfigure(1, weight=1)
@@ -203,8 +217,9 @@ class App(tk.Frame):
 
         tk.Button(self,
                   text="Place Order"
-                  ).grid(row=11, column=0, columnspan=4, sticky="nsew",
+                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew",
                          padx=5, pady=5)
+        rowcount += 1
 
 
 root = tk.Tk()
