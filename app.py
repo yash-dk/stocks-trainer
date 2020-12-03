@@ -30,6 +30,11 @@ class App(tk.Frame):
             weight="bold",
             size=round(20 * .66))
 
+        self.font_esmall = tkFont.Font(
+            family="Times New Roman",
+            weight="bold",
+            size=round(20 * .45))
+
     def construct_widget(self):
         # Main GUI
         rowcount = 0
@@ -56,14 +61,14 @@ class App(tk.Frame):
         # Buy Button
         tk.Button(self,
                   text="BUY\n$2020",
-                  font=self.font_small
+                  font=self.font_esmall
                   ).grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
 
         # Sell Button
         tk.Button(self,
                   text="SELL\n$2020",
-                  font=self.font_small
+                  font=self.font_esmall
                   ).grid(row=rowcount, column=2, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
         rowcount += 1
@@ -140,7 +145,7 @@ class App(tk.Frame):
         markettab.grid_columnconfigure(1, weight=1)
         tk.Label(markettab,
                  text="MARKET ORDER",
-                 font=self.font_small
+                 font=self.font_esmall
                  ).grid(row=0, column=0,  columnspan=4, sticky="nsew",
                         padx=5, pady=5)
 
@@ -150,7 +155,12 @@ class App(tk.Frame):
                         padx=5, pady=5)
 
         tk.Entry(markettab
-                 ).grid(row=1, column=1,  columnspan=3, sticky="nsew",
+                 ).grid(row=1, column=1,  columnspan=2, sticky="nsew",
+                        padx=5, pady=5)
+        
+        tk.Button(markettab,
+                 text="MAX"
+                 ).grid(row=1, column=3,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Label(markettab,
@@ -175,7 +185,7 @@ class App(tk.Frame):
         limittab.grid_columnconfigure(1, weight=1)
         tk.Label(limittab,
                  text="LIMIT ORDER",
-                 font=self.font_small
+                 font=self.font_esmall
                  ).grid(row=0, column=0,  columnspan=4, sticky="nsew",
                         padx=5, pady=5)
 
@@ -221,6 +231,14 @@ class App(tk.Frame):
                          padx=5, pady=5)
         rowcount += 1
 
+        # Positions
+        
+        tk.Label(self,text="Positions", font=self.font_esmall).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
+        rowcount += 1
+        
+        positions = tk.Listbox(self)
+        positions.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
+        positions.insert(tk.END, "B.BITCOINNNN @ 200,000 Q.100,000")
 
 root = tk.Tk()
 root.title('Trainer')
