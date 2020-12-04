@@ -105,13 +105,17 @@ class Trade:
     """This class represents a trade taken by user.
     """
     status = True
-    def __init__(self, ohlc=None):
+    def __init__(self, ohlc=None, is_sell=False):
         self.ohlc = ohlc
+        self.is_sell = is_sell
 
     def market_order(self, quantity, take_profit=None, stop_loss=None):
         self.mo = True
         self.lo = False
-        self.quantity = quantity
+        if self.is_sell:
+            self.quantity = -quantity
+        else:
+            self.quantity = quantity
         self.take_profit = take_profit
         self.stop_loss = stop_loss
 
@@ -119,7 +123,10 @@ class Trade:
         self.mo = False
         self.lo = True
         self.limit = limit
-        self.quantity = quantity
+        if self.is_sell:
+            self.quantity = -quantity
+        else:
+            self.quantity = quantity
         self.take_profit = take_profit
         self.stop_loss = stop_loss
 
@@ -151,51 +158,170 @@ class Position:
         }
 
         self.pending_trades[0].link_ohlc(self.ohlc)
+        self.is_short = trade.is_sell
         self.stop_loss = None
         self.take_profit = None
         self.quantity = 0
-        self.price = 0
+        self.avg_price = 0
+        self.profit = 0
+        self.status = True
 
     def add_trade(self, trade):
         if isinstance(trade, Trade):
+            trade.link_ohlc(self.ohlc)
             self.pending_trades.append(trade)
 
     def add_quantity(self, quantity, price):
         try:
-            current_total = self.quantity * self.price
-            self.quantity += quantity
-            now_total = price * quantity
-            current_total += now_total
-            self.price = current_total/self.quantity
+            res = self.quantity + quantity
+            if not self.is_short:
+                if res == 0:
+                    # squareoff
+                    buy_cap = self.avg_price * self.quantity
+                    sell_cap = price * self.quantity
+                    self.quantity = 0
+                    self.profit = sell_cap - buy_cap
+                    pass
+                elif res < 0:
+                    # squareoff
+                    buy_cap = self.avg_price * self.quantity
+                    sell_cap = price * self.quantity
+                    self.quantity = 0
+                    self.profit = sell_cap - buy_cap
+                    messagebox.showerror("Oversold","You sold more quantity then you bought.")
+                    pass
+                else:
+                    buy_cap = self.avg_price * self.quantity
+                    add_cap = price * quantity
+                    self.quantity += quantity
+                    buy_cap += add_cap
+                    self.avg_price = buy_cap/self.quantity
+                    
+                    buy_cap = self.avg_price * self.quantity
+                    sell_cap = price * self.quantity
+                    
+                    self.profit = sell_cap - buy_cap
+                    
+                    pass
+            else:
+                if res == 0:
+                    # squareoff
+                    buy_cap = self.avg_price * self.quantity
+                    sell_cap = price * self.quantity
+                    self.quantity = 0
+                    self.profit =  buy_cap + sell_cap
+                    pass
+                elif res > 0:
+                    # squareoff
+                    buy_cap = self.avg_price * self.quantity
+                    sell_cap = price * self.quantity
+                    self.quantity = 0
+                    self.profit = sell_cap + buy_cap
+                    messagebox.showerror("Overbought","You bought more quantity then you sold.")
+                    pass
+                else:
+                    buy_cap = self.avg_price * self.quantity
+                    add_cap = price * quantity
+                    self.quantity += quantity
+                    buy_cap -= add_cap
+                    self.avg_price = buy_cap/self.quantity
+                    
+                    buy_cap = self.avg_price * self.quantity
+                    sell_cap = price * self.quantity
+                    
+                    self.profit = sell_cap + buy_cap 
+                    
+                    pass
+            
+                
         except:
+            print("excp")
             pass
-        
+    
+    def get_value(self):
+        return abs(self.avg_price)
+
+    def get_profit(self):
+        if self.is_short:
+            return -(self.profit)
+        else:
+            return self.profit
+    
+    def get_quantity(self):
+        return abs(self.quantity)
+
     def check_sl_tk(self):
         if self.stop_loss is not None:
             if self.stop_loss <= self.ohlc["high"] and self.stop_loss >= self.ohlc["low"]:
                 messagebox.showinfo("Stop Loss","Stop loss hit.")
+                print("sl hit")
 
         if self.take_profit is not None:
             if self.take_profit <= self.ohlc["high"] and self.take_profit >= self.ohlc["low"]:
                 messagebox.showinfo("Profit","Profit booked at take profit.")
+                print("profit")
 
     def execute_trades(self):
         for i in self.pending_trades:
             quantity, price = i.execute()
             if quantity is not None:
-                self.add_quantity(quantity, price)
                 self.stop_loss = i.stop_loss
                 self.take_profit = i.take_profit
                 self.pending_trades.remove(i)
                 self.done_trades.append(i)
+                self.add_quantity(quantity, price)
 
     def update_ohlc(self,ohlc):
+        
         self.ohlc["open"] = ohlc["open"]
         self.ohlc["high"] = ohlc["high"]
         self.ohlc["low"] = ohlc["low"]
         self.ohlc["close"] = ohlc["close"]
+        self.check_sl_tk()
+        self.execute_trades()
         
 
 if __name__ == "__main__":
-    Session()
-    input()
+    ohlc = {
+            "open":10,
+            "high":12,
+            "low":8,
+            "close":9
+        }
+    t1 = Trade()
+    t1.market_order(100)
+    pos = Position(t1)
+    print(pos.get_quantity())
+    print(pos.get_value())
+    
+    pos.update_ohlc(ohlc)
+    ohlc = {
+            "open":9,
+            "high":21,
+            "low":9,
+            "close":10
+        }
+    print(pos.get_quantity())
+    print(pos.get_value())
+    
+    t1 = Trade()
+    t1.market_order(100)
+    pos.add_trade(t1)
+    pos.update_ohlc(ohlc)
+    print(pos.get_quantity())
+    print(pos.get_value())
+    ohlc = {
+            "open":9,
+            "high":21,
+            "low":9,
+            "close":11
+        }
+    t1 = Trade(is_sell=True)
+    t1.market_order(100)
+    pos.add_trade(t1)
+    pos.update_ohlc(ohlc)
+    print(pos.get_quantity())
+    print(pos.get_value())
+    print(pos.get_profit())
+    # t1.limit_order(100,17)
+
