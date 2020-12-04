@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import tkinter.font as tkFont
-
+from session import Session
 
 class App(tk.Frame):
     def __init__(self, master=None):
@@ -10,7 +10,10 @@ class App(tk.Frame):
         self.master.configure(background="#1E1E1E")
         self.pack()
         self.fonts()
+        self.tvars()
         self.construct_widget()
+        self.session = Session()
+        self.playback_running = False
 
     def fonts(self):
         """
@@ -35,13 +38,32 @@ class App(tk.Frame):
             weight="bold",
             size=round(20 * .45))
 
+    def tvars(self):
+        self.open_label = tk.StringVar()
+        self.open_label.set("Open")
+        self.close_label = tk.StringVar()
+        self.close_label.set("Close")
+        self.high_label = tk.StringVar()
+        self.high_label.set("High")
+        self.low_label = tk.StringVar()
+        self.low_label.set("Low")
+        self.symbol = tk.StringVar()
+        self.symbol_name = tk.StringVar()
+        self.buy_label = tk.StringVar()
+        self.buy_label.set("Buy\n0.00")
+        self.sell_label = tk.StringVar()
+        self.sell_label.set("Sell\n0.00")
+        self.play_pause_label = tk.StringVar()
+        self.play_pause_label.set("▶")
+        
+
     def construct_widget(self):
         # Main GUI
         rowcount = 0
 
         # Symbol
         tk.Label(self,
-                 text="BITCOIN",
+                 textvariable=self.symbol,
                  font=self.font_normal,
                  width=15
                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew",
@@ -50,7 +72,7 @@ class App(tk.Frame):
 
         # Symbol Full Name
         tk.Label(self,
-                 text="BITCOIN PTV. LTD."
+                 textvariable=self.symbol_name
                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         rowcount += 1
 
@@ -60,14 +82,14 @@ class App(tk.Frame):
 
         # Buy Button
         tk.Button(self,
-                  text="BUY\n$2020",
+                  textvariable=self.buy_label,
                   font=self.font_esmall
                   ).grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
 
         # Sell Button
         tk.Button(self,
-                  text="SELL\n$2020",
+                  textvariable=self.sell_label,
                   font=self.font_esmall
                   ).grid(row=rowcount, column=2, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
@@ -79,23 +101,32 @@ class App(tk.Frame):
 
         # Initialize replay
         tk.Button(self,
+                  text="Fetch",
+                  font=self.font_small,
+                  command=self.fetch
+                  ).grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
+                         padx=5, pady=5)
+        tk.Button(self,
                   text="◀◀",
-                  font=self.font_small
-                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew",
+                  font=self.font_small,
+                  command=self.replay
+                  ).grid(row=rowcount, column=2, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
         rowcount += 1
 
         # Play / Pause the replay
         tk.Button(self,
-                  text="▶",
-                  font=self.font_small
+                  textvariable=self.play_pause_label,
+                  font=self.font_small,
+                  command=self.play_pause
                   ).grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
 
         # Advance the bar by one
         tk.Button(self,
                   text="⏯",
-                  font=self.font_small
+                  font=self.font_small,
+                  command=self.bar_fwd
                   ).grid(row=rowcount, column=2,  columnspan=2, sticky="nsew",
                          padx=5, pady=5)
         rowcount += 1
@@ -106,19 +137,19 @@ class App(tk.Frame):
 
         # OHLC Data of surrent candle
         ttk.Label(self,
-                  text="open\n15.12"
+                  textvariable=self.open_label
                   ).grid(row=rowcount, column=0, columnspan=1, sticky="nsew")
 
         ttk.Label(self,
-                  text="close\n15.10"
+                  textvariable=self.close_label
                   ).grid(row=rowcount, column=1, columnspan=1, sticky="nsew")
 
         ttk.Label(self,
-                  text="high\n16.10"
+                  textvariable=self.high_label
                   ).grid(row=rowcount, column=2, columnspan=1, sticky="nsew")
 
         ttk.Label(self,
-                  text="low\n10.25"
+                  textvariable=self.low_label
                   ).grid(row=rowcount, column=3, columnspan=1, sticky="nsew")
         rowcount += 1
 
@@ -256,6 +287,43 @@ class App(tk.Frame):
         positions = tk.Listbox(self, height=3)
         positions.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         positions.insert(tk.END, "..")
+    
+    def fetch(self):
+        name = self.session.get_name()
+        self.symbol.set(name)
+        fname = self.session.get_fname()
+        self.symbol_name.set(fname)
+
+
+    def routine_task(self):
+        ohlc = self.session.get_ohlc()
+        if ohlc is not None:
+
+            self.open_label.set("Open\n{}".format(ohlc["open"]))
+            self.close_label.set("Close\n{}".format(ohlc["close"]))
+            self.high_label.set("High\n{}".format(ohlc["high"]))
+            self.low_label.set("Low\n{}".format(ohlc["low"]))
+            self.buy_label.set("Buy\n{}".format(ohlc["close"]))
+            self.sell_label.set("Sell\n{}".format(ohlc["close"]))
+        if self.playback_running:
+            self.after(200,self.routine_task)
+
+    def replay(self):
+        self.session.click_replay()
+
+    def play_pause(self):
+        if self.playback_running:
+            self.playback_running = False
+        else:
+            self.playback_running = True
+        
+        self.routine_task()
+        self.session.click_pause_play()
+
+    def bar_fwd(self):
+        self.session.click_fwd_bar()
+
+    
 
 
 root = tk.Tk()
