@@ -1,8 +1,8 @@
 from selenium import webdriver
 import traceback
 import xpath
-import time
 from tkinter import messagebox
+
 
 class Session:
     """This class represents a user session of trading.
@@ -25,8 +25,8 @@ class Session:
 
     def show_error(self, exception, message="Report the issue on github."):
         print(traceback.format_exc(exception))
-        messagebox.showerror(str(exception),str(exception)+message)
-    
+        messagebox.showerror(str(exception), str(exception)+message)
+
     def get_ohlc(self):
         ohlc = {}
         try:
@@ -53,7 +53,6 @@ class Session:
         except Exception as e:
             self.show_error(e)
             return None
-
 
         ohlc["open"] = open_
         ohlc["high"] = high
@@ -102,7 +101,8 @@ class Session:
         except Exception as e:
             self.show_error(e)
             return False
-            
+
+
 if __name__ == "__main__":
     Session()
     input()

@@ -7,5 +7,4 @@ LOW = "/html/body/div[2]/div[1]/div[2]/div[1]/div/table/tr[1]/td[2]/div/div[1]/d
 CLOSE = "/html/body/div[2]/div[1]/div[2]/div[1]/div/table/tr[1]/td[2]/div/div[1]/div[1]/div[1]/div[2]/div/div[5]/div[2]"
 REPLAY_BUTTON = "/html/body/div[2]/div[2]/div/div/div[1]/div[1]/div/div/div/div/div[9]/div"
 PLAY_PAUSE_SCRIPT = '$(".tv-replay-toolbar__button")[1].click()'
-              
 FWD_BAR_SCRIPT = '$(".tv-replay-toolbar__button")[2].click()'

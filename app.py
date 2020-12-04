@@ -157,11 +157,11 @@ class App(tk.Frame):
         tk.Entry(markettab
                  ).grid(row=1, column=1,  columnspan=2, sticky="nsew",
                         padx=5, pady=5)
-        
+
         tk.Button(markettab,
-                 text="MAX"
-                 ).grid(row=1, column=3,  columnspan=1, sticky="nsew",
-                        padx=5, pady=5)
+                  text="MAX"
+                  ).grid(row=1, column=3,  columnspan=1, sticky="nsew",
+                         padx=5, pady=5)
 
         tk.Label(markettab,
                  text="Take Profit"
@@ -232,13 +232,15 @@ class App(tk.Frame):
         rowcount += 1
 
         # Positions
-        
-        tk.Label(self,text="Positions", font=self.font_esmall).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
+
+        tk.Label(self, text="Positions", font=self.font_esmall
+                 ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         rowcount += 1
-        
+
         positions = tk.Listbox(self)
         positions.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         positions.insert(tk.END, "..")
+
 
 root = tk.Tk()
 root.title('Trainer')
