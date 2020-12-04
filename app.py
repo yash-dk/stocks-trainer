@@ -238,7 +238,7 @@ class App(tk.Frame):
         
         positions = tk.Listbox(self)
         positions.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
-        positions.insert(tk.END, "B.BITCOINNNN @ 200,000 Q.100,000")
+        positions.insert(tk.END, "..")
 
 root = tk.Tk()
 root.title('Trainer')
