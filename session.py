@@ -4,13 +4,12 @@ import xpath
 from tkinter import messagebox
 
 
+
 class Session:
     """This class represents a user session of trading.
     """
     def __init__(self):
         self.init_webdriver()
-        input()
-        self.demo()
 
     def init_webdriver(self):
         try:
@@ -102,6 +101,100 @@ class Session:
             self.show_error(e)
             return False
 
+class Trade:
+    """This class represents a trade taken by user.
+    """
+    status = True
+    def __init__(self, ohlc=None):
+        self.ohlc = ohlc
+
+    def market_order(self, quantity, take_profit=None, stop_loss=None):
+        self.mo = True
+        self.lo = False
+        self.quantity = quantity
+        self.take_profit = take_profit
+        self.stop_loss = stop_loss
+
+    def limit_order(self, quantity, limit, take_profit=None, stop_loss=None):
+        self.mo = False
+        self.lo = True
+        self.limit = limit
+        self.quantity = quantity
+        self.take_profit = take_profit
+        self.stop_loss = stop_loss
+
+    def execute(self):
+        if self.ohlc is not None:
+            if self.mo:
+                return self.quantity, self.ohlc["close"]
+            elif self.lo:
+                if self.limit <= self.ohlc["high"] and self.limit >= self.ohlc["low"]:
+                    return self.quantity, self.limit
+        return None, None
+
+    def link_ohlc(self,ohlc):
+        self.ohlc = ohlc
+
+
+class Position:
+    """This class represents a position taken by user.
+    """
+    
+    def __init__(self, trade):
+        self.pending_trades = [trade]
+        self.done_trades = []
+        self.ohlc = {
+            "open":0,
+            "high":0,
+            "low":0,
+            "close":0
+        }
+
+        self.pending_trades[0].link_ohlc(self.ohlc)
+        self.stop_loss = None
+        self.take_profit = None
+        self.quantity = 0
+        self.price = 0
+
+    def add_trade(self, trade):
+        if isinstance(trade, Trade):
+            self.pending_trades.append(trade)
+
+    def add_quantity(self, quantity, price):
+        try:
+            current_total = self.quantity * self.price
+            self.quantity += quantity
+            now_total = price * quantity
+            current_total += now_total
+            self.price = current_total/self.quantity
+        except:
+            pass
+        
+    def check_sl_tk(self):
+        if self.stop_loss is not None:
+            if self.stop_loss <= self.ohlc["high"] and self.stop_loss >= self.ohlc["low"]:
+                messagebox.showinfo("Stop Loss","Stop loss hit.")
+
+        if self.take_profit is not None:
+            if self.take_profit <= self.ohlc["high"] and self.take_profit >= self.ohlc["low"]:
+                messagebox.showinfo("Profit","Profit booked at take profit.")
+
+    def execute_trades(self):
+        for i in self.pending_trades:
+            quantity, price = i.execute()
+            if quantity is not None:
+                self.add_quantity(quantity, price)
+                self.stop_loss = i.stop_loss
+                self.take_profit = i.take_profit
+                self.pending_trades.remove(i)
+                self.done_trades.append(i)
+
+    def update_ohlc(self,ohlc):
+        self.ohlc["open"] = ohlc["open"]
+        self.ohlc["high"] = ohlc["high"]
+        self.ohlc["low"] = ohlc["low"]
+        self.ohlc["close"] = ohlc["close"]
+        
 
 if __name__ == "__main__":
     Session()

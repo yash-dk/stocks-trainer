@@ -231,13 +231,29 @@ class App(tk.Frame):
                          padx=5, pady=5)
         rowcount += 1
 
+        ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
+                                 sticky="nsew")
+        rowcount += 1
+
         # Positions
 
         tk.Label(self, text="Positions", font=self.font_esmall
                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         rowcount += 1
 
-        positions = tk.Listbox(self)
+        tk.Label(self, text="Long Bitcoinnnn @ 123456789 Q.1,00,00,00,000"
+                 ).grid(row=rowcount, column=0, columnspan=4, sticky="w")
+        rowcount += 1
+
+        ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
+                                 sticky="nsew")
+        rowcount += 1
+
+        tk.Label(self, text="Trade History", font=self.font_esmall
+                 ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
+        rowcount += 1
+
+        positions = tk.Listbox(self, height=3)
         positions.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         positions.insert(tk.END, "..")
 
