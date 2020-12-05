@@ -233,9 +233,9 @@ class Position:
                                 net_price_sold += self.shares[i][0] * abs(quantity)
                                 quantity = 0
 
-                        print(net_price_sold,"nps")
+                        
                         curr_value_sold = price * abs(bquant)
-                        print(curr_value_sold)
+                        
                         self.booked.append([net_price_sold,curr_value_sold])
                         for i in pops:
                             self.shares.remove(i)
@@ -285,11 +285,11 @@ class Position:
                         net_price_sold = 0
                         
                         pops = []
-                        print(quantity)
+                        
                         for i in range(len(self.shares)):
                             
                             res = self.shares[i][1] + quantity
-                            print("res ",res)
+                            
                             if res > 0:
                                 quantity = res
                                 net_price_sold += self.shares[i][0] * abs(self.shares[i][1])
@@ -301,19 +301,19 @@ class Position:
                                 pops.append(self.shares[i])
                                 #self.shares.pop(i)
                                 net_price_sold += self.shares[i][0] * abs(self.shares[i][1])
-                                print("sold all ", net_price_sold)
+                                
                             else:
                                 
                                 self.shares[i][1] = res
                                 net_price_sold += self.shares[i][0] * abs(quantity)
                                 quantity = 0
 
-                        print(net_price_sold,"nps")
+                        
                         curr_value_sold = price * abs(bquant)
-                        print(curr_value_sold)
+                        
                         self.booked.append([net_price_sold,curr_value_sold])
                         for i in pops:
-                            print("rm ",i)
+                            
                             self.shares.remove(i)
                         
                         self.quantity
@@ -364,8 +364,17 @@ class Position:
         for i in self.booked:
             buy_price += i[0]
             sell_price += i[1]
-        print(sell_price, buy_price, " profit")
-        return sell_price - buy_price
+        
+        bookedp = sell_price - buy_price
+        
+        buy_price = 0
+        for i in self.shares:
+            buy_price+= i[0] * abs(i[1])
+
+        sell_price = self.quantity * self.ohlc["close"]
+        notbookedp = sell_price - buy_price
+
+        return notbookedp+bookedp
 
     @property
     def avg_price(self):
@@ -410,6 +419,7 @@ class Position:
         self.ohlc["close"] = ohlc["close"]
         self.check_sl_tk()
         self.execute_trades()
+        self.profit
         
 
 if __name__ == "__main__":
@@ -441,6 +451,7 @@ if __name__ == "__main__":
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
     print(pos.get_value())
+    print(pos.get_profit(),"here")
     print("")
     ohlc = {
             "open":9,
