@@ -161,9 +161,7 @@ class Position:
         self.is_short = trade.is_sell
         self.stop_loss = None
         self.take_profit = None
-        #self.quantity = 0
-        #self.avg_price = 0
-        #self.profit = 0
+
         self.status = True
         self.shares = []
         self.booked = []
@@ -182,8 +180,7 @@ class Position:
                     # squareoff
                     buy_cap = self.avg_price * self.quantity
                     sell_cap = price * self.quantity
-                    #self.quantity = 0
-                    #self.profit = sell_cap - buy_cap
+
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
                     pass
@@ -191,8 +188,7 @@ class Position:
                     # squareoff
                     buy_cap = self.avg_price * self.quantity
                     sell_cap = price * self.quantity
-                    #self.quantity = 0
-                    #self.profit = sell_cap - buy_cap
+
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
                     messagebox.showerror("Oversold","You sold more quantity then you bought.")
@@ -201,12 +197,7 @@ class Position:
                     if quantity > 0:
                         pass
 
-                    #buy_cap = self.avg_price * self.quantity
-                    #add_cap = price * quantity
-                    #self.quantity += quantity
-                    #buy_cap += add_cap
-                    #self.avg_price = buy_cap/self.quantity
-                    
+
                     if quantity < 0:
                         
                         bquant = quantity
@@ -221,12 +212,10 @@ class Position:
                                 quantity = res
                                 net_price_sold += self.shares[i][0] * self.shares[i][1]
                                 pops.append(self.shares[i])
-                                #self.shares.pop(i)
                                 
                             elif res == 0:
                                 quantity = res
                                 pops.append(self.shares[i])
-                                #self.shares.pop(i)
                                 net_price_sold += self.shares[i][0] * self.shares[i][1]
                             else:
                                 self.shares[i][1] = res
@@ -249,16 +238,12 @@ class Position:
                     buy_cap = self.avg_price * self.quantity
                     sell_cap = price * self.quantity
                     
-                    #self.profit = sell_cap - buy_cap
-                    
                     pass
             else:
                 if res == 0:
                     # squareoff
                     buy_cap = self.avg_price * abs(self.quantity)
                     sell_cap = price * abs(self.quantity)
-                    #self.quantity = 0
-                    #self.profit =  buy_cap + sell_cap
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
                     pass
@@ -266,19 +251,11 @@ class Position:
                     # squareoff
                     buy_cap = self.avg_price * abs(self.quantity)
                     sell_cap = price * abs(self.quantity)
-                    #self.quantity = 0
-                    #self.profit = sell_cap + buy_cap
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
                     messagebox.showerror("Overbought","You bought more quantity then you sold.")
                     pass
                 else:
-                    #buy_cap = self.avg_price * self.quantity
-                    #add_cap = price * quantity
-                    #self.quantity += quantity
-                    #buy_cap -= add_cap
-                    #self.avg_price = buy_cap/self.quantity
-
                     if quantity > 0:
                         
                         bquant = quantity
@@ -294,12 +271,10 @@ class Position:
                                 quantity = res
                                 net_price_sold += self.shares[i][0] * abs(self.shares[i][1])
                                 pops.append(self.shares[i])
-                                #self.shares.pop(i)
-                                
+                               
                             elif res == 0:
                                 quantity = res
                                 pops.append(self.shares[i])
-                                #self.shares.pop(i)
                                 net_price_sold += self.shares[i][0] * abs(self.shares[i][1])
                                 
                             else:
@@ -323,12 +298,7 @@ class Position:
                     self.shares.append([price, quantity])
                     self.quantity
                     self.avg_price
-
-                    #buy_cap = self.avg_price * self.quantity
-                    #sell_cap = price * self.quantity
-                    #
-                    #self.profit = sell_cap + buy_cap 
-                    
+                   
                     pass
             
                 
@@ -429,7 +399,7 @@ if __name__ == "__main__":
             "low":8,
             "close":9
         }
-    t1 = Trade()
+    t1 = Trade(is_sell=True)
     t1.market_order(100)
     pos = Position(t1)
     print(pos.get_quantity())
@@ -446,7 +416,7 @@ if __name__ == "__main__":
     print(pos.get_value())
     print("")
     t1 = Trade()
-    t1.market_order(100)
+    t1.market_order(50)
     pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
@@ -460,7 +430,7 @@ if __name__ == "__main__":
             "close":8
         }
     t1 = Trade(is_sell=True)
-    t1.market_order(50)
+    t1.market_order(100)
     pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
@@ -473,7 +443,7 @@ if __name__ == "__main__":
             "low":9,
             "close":7
         }
-    t1 = Trade(is_sell=True)
+    t1 = Trade()
     t1.market_order(150)
     pos.add_trade(t1)
     pos.update_ohlc(ohlc)
