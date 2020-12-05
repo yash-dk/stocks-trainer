@@ -161,10 +161,12 @@ class Position:
         self.is_short = trade.is_sell
         self.stop_loss = None
         self.take_profit = None
-        self.quantity = 0
-        self.avg_price = 0
-        self.profit = 0
+        #self.quantity = 0
+        #self.avg_price = 0
+        #self.profit = 0
         self.status = True
+        self.shares = []
+        self.booked = []
 
     def add_trade(self, trade):
         if isinstance(trade, Trade):
@@ -179,28 +181,69 @@ class Position:
                     # squareoff
                     buy_cap = self.avg_price * self.quantity
                     sell_cap = price * self.quantity
-                    self.quantity = 0
-                    self.profit = sell_cap - buy_cap
+                    #self.quantity = 0
+                    #self.profit = sell_cap - buy_cap
+                    self.booked.append([buy_cap, sell_cap])
                     pass
                 elif res < 0:
                     # squareoff
                     buy_cap = self.avg_price * self.quantity
                     sell_cap = price * self.quantity
-                    self.quantity = 0
-                    self.profit = sell_cap - buy_cap
+                    #self.quantity = 0
+                    #self.profit = sell_cap - buy_cap
+                    self.booked.append([buy_cap, sell_cap])
                     messagebox.showerror("Oversold","You sold more quantity then you bought.")
                     pass
                 else:
-                    buy_cap = self.avg_price * self.quantity
-                    add_cap = price * quantity
-                    self.quantity += quantity
-                    buy_cap += add_cap
-                    self.avg_price = buy_cap/self.quantity
+                    if quantity > 0:
+                        pass
+
+                    #buy_cap = self.avg_price * self.quantity
+                    #add_cap = price * quantity
+                    #self.quantity += quantity
+                    #buy_cap += add_cap
+                    #self.avg_price = buy_cap/self.quantity
                     
+                    if quantity < 0:
+                        
+                        bquant = quantity
+                        net_price_sold = 0
+                        
+                        pops = []
+                        for i in range(len(self.shares)):
+                            
+                            res = self.shares[i][1] + quantity
+                            
+                            if res < 0:
+                                quantity = res
+                                net_price_sold += self.shares[i][0] * self.shares[i][1]
+                                pops.append(self.shares[i])
+                                #self.shares.pop(i)
+                                
+                            elif res == 0:
+                                pops.append(self.shares[i])
+                                #self.shares.pop(i)
+                                net_price_sold += self.shares[i][0] * self.shares[i][1]
+                            else:
+                                self.shares[i][1] = res
+                                net_price_sold += self.shares[i][0] * abs(quantity)
+                        print(net_price_sold,"nps")
+                        curr_value_sold = price * abs(bquant)
+                        print(curr_value_sold)
+                        self.booked.append([net_price_sold,curr_value_sold])
+                        for i in pops:
+                            self.shares.remove(i)
+                        
+                        self.quantity
+                        self.avg_price
+                        return
+                    self.shares.append([price, quantity])
+                    self.quantity
+                    self.avg_price
                     buy_cap = self.avg_price * self.quantity
                     sell_cap = price * self.quantity
                     
-                    self.profit = sell_cap - buy_cap
+                    #self.profit = sell_cap - buy_cap
                     
                     pass
             else:
@@ -220,22 +263,27 @@ class Position:
                     messagebox.showerror("Overbought","You bought more quantity then you sold.")
                     pass
                 else:
-                    buy_cap = self.avg_price * self.quantity
-                    add_cap = price * quantity
-                    self.quantity += quantity
-                    buy_cap -= add_cap
-                    self.avg_price = buy_cap/self.quantity
-                    
-                    buy_cap = self.avg_price * self.quantity
-                    sell_cap = price * self.quantity
-                    
-                    self.profit = sell_cap + buy_cap 
+                    #buy_cap = self.avg_price * self.quantity
+                    #add_cap = price * quantity
+                    #self.quantity += quantity
+                    #buy_cap -= add_cap
+                    #self.avg_price = buy_cap/self.quantity
+
+                    self.shares.append([price, quantity])
+                    self.quantity
+                    self.avg_price
+
+                    #buy_cap = self.avg_price * self.quantity
+                    #sell_cap = price * self.quantity
+                    #
+                    #self.profit = sell_cap + buy_cap 
                     
                     pass
             
                 
-        except:
-            print("excp")
+        except Exception as e:
+            print("excp", e)
+            print(traceback.format_exc(e))
             pass
     
     def get_value(self):
@@ -249,6 +297,38 @@ class Position:
     
     def get_quantity(self):
         return abs(self.quantity)
+
+    @property
+    def quantity(self):
+        qnt = 0
+        for i in self.shares:
+            qnt += i[1]
+        
+        return qnt
+
+    @property
+    def profit(self):
+        buy_price = 0
+        sell_price = 0
+        for i in self.booked:
+            buy_price += i[0]
+            sell_price += i[1]
+        
+        return sell_price - buy_price
+
+    @property
+    def avg_price(self):
+        avg = 0
+        total_price = 0
+        total_quantity = self.quantity
+        for i in self.shares:
+            total_price += (i[0] * i[1])
+        try:
+            avg = total_price/total_quantity
+        except ZeroDivisionError:
+            pass
+
+        return avg
 
     def check_sl_tk(self):
         if self.stop_loss is not None:
@@ -314,14 +394,28 @@ if __name__ == "__main__":
             "open":9,
             "high":21,
             "low":9,
-            "close":11
+            "close":8
         }
     t1 = Trade(is_sell=True)
-    t1.market_order(100)
+    t1.market_order(102)
     pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
     print(pos.get_value())
     print(pos.get_profit())
+    ohlc = {
+            "open":9,
+            "high":21,
+            "low":9,
+            "close":7
+        }
+    t1 = Trade(is_sell=True)
+    t1.market_order(98)
+    pos.add_trade(t1)
+    pos.update_ohlc(ohlc)
+    print(pos.get_quantity())
+    print(pos.get_value())
+    print(pos.get_profit())
+    print(pos.done_trades)
     # t1.limit_order(100,17)
 
