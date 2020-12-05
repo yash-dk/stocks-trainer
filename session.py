@@ -101,10 +101,12 @@ class Session:
             self.show_error(e)
             return False
 
+
 class Trade:
     """This class represents a trade taken by user.
     """
     status = True
+
     def __init__(self, ohlc=None, is_sell=False):
         self.ohlc = ohlc
         self.is_sell = is_sell
@@ -135,26 +137,27 @@ class Trade:
             if self.mo:
                 return self.quantity, self.ohlc["close"]
             elif self.lo:
-                if self.limit <= self.ohlc["high"] and self.limit >= self.ohlc["low"]:
+                if (self.limit <= self.ohlc["high"]
+                        and self.limit >= self.ohlc["low"]):
                     return self.quantity, self.limit
         return None, None
 
-    def link_ohlc(self,ohlc):
+    def link_ohlc(self, ohlc):
         self.ohlc = ohlc
 
 
 class Position:
     """This class represents a position taken by user.
     """
-    
+
     def __init__(self, trade):
         self.pending_trades = [trade]
         self.done_trades = []
         self.ohlc = {
-            "open":0,
-            "high":0,
-            "low":0,
-            "close":0
+            "open": 0,
+            "high": 0,
+            "low": 0,
+            "close": 0
         }
 
         self.pending_trades[0].link_ohlc(self.ohlc)
@@ -174,7 +177,7 @@ class Position:
     def add_quantity(self, quantity, price):
         try:
             res = self.quantity + quantity
-            
+
             if not self.is_short:
                 if res == 0:
                     # squareoff
@@ -191,28 +194,25 @@ class Position:
 
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
-                    messagebox.showerror("Oversold","You sold more quantity then you bought.")
+                    messagebox.showerror("Oversold", "You sold more quantity then you bought.")
                     pass
                 else:
-                    if quantity > 0:
-                        pass
-
 
                     if quantity < 0:
-                        
+
                         bquant = quantity
                         net_price_sold = 0
-                        
+
                         pops = []
                         for i in range(len(self.shares)):
-                            
+
                             res = self.shares[i][1] + quantity
-                            
+
                             if res < 0:
                                 quantity = res
                                 net_price_sold += self.shares[i][0] * self.shares[i][1]
                                 pops.append(self.shares[i])
-                                
+
                             elif res == 0:
                                 quantity = res
                                 pops.append(self.shares[i])
@@ -222,13 +222,12 @@ class Position:
                                 net_price_sold += self.shares[i][0] * abs(quantity)
                                 quantity = 0
 
-                        
                         curr_value_sold = price * abs(bquant)
-                        
-                        self.booked.append([net_price_sold,curr_value_sold])
+
+                        self.booked.append([net_price_sold, curr_value_sold])
                         for i in pops:
                             self.shares.remove(i)
-                        
+
                         self.quantity
                         self.avg_price
                         return
@@ -237,7 +236,7 @@ class Position:
                     self.avg_price
                     buy_cap = self.avg_price * self.quantity
                     sell_cap = price * self.quantity
-                    
+
                     pass
             else:
                 if res == 0:
@@ -253,44 +252,43 @@ class Position:
                     sell_cap = price * abs(self.quantity)
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
-                    messagebox.showerror("Overbought","You bought more quantity then you sold.")
+                    messagebox.showerror("Overbought", "You bought more quantity then you sold.")
                     pass
                 else:
                     if quantity > 0:
-                        
+
                         bquant = quantity
                         net_price_sold = 0
-                        
+
                         pops = []
-                        
+
                         for i in range(len(self.shares)):
-                            
+
                             res = self.shares[i][1] + quantity
-                            
+
                             if res > 0:
                                 quantity = res
                                 net_price_sold += self.shares[i][0] * abs(self.shares[i][1])
                                 pops.append(self.shares[i])
-                               
+
                             elif res == 0:
                                 quantity = res
                                 pops.append(self.shares[i])
                                 net_price_sold += self.shares[i][0] * abs(self.shares[i][1])
-                                
+
                             else:
-                                
+
                                 self.shares[i][1] = res
                                 net_price_sold += self.shares[i][0] * abs(quantity)
                                 quantity = 0
 
-                        
                         curr_value_sold = price * abs(bquant)
-                        
-                        self.booked.append([net_price_sold,curr_value_sold])
+
+                        self.booked.append([net_price_sold, curr_value_sold])
                         for i in pops:
-                            
+
                             self.shares.remove(i)
-                        
+
                         self.quantity
                         self.avg_price
                         return
@@ -298,15 +296,14 @@ class Position:
                     self.shares.append([price, quantity])
                     self.quantity
                     self.avg_price
-                   
+
                     pass
-            
-                
+
         except Exception as e:
             print("excp", e)
             print(traceback.format_exc(e))
             pass
-    
+
     def get_value(self):
         return abs(self.avg_price)
 
@@ -315,7 +312,7 @@ class Position:
             return -(self.profit)
         else:
             return self.profit
-    
+
     def get_quantity(self):
         return abs(self.quantity)
 
@@ -324,7 +321,7 @@ class Position:
         qnt = 0
         for i in self.shares:
             qnt += i[1]
-        
+
         return qnt
 
     @property
@@ -334,12 +331,12 @@ class Position:
         for i in self.booked:
             buy_price += i[0]
             sell_price += i[1]
-        
+
         bookedp = sell_price - buy_price
-        
+
         buy_price = 0
         for i in self.shares:
-            buy_price+= i[0] * abs(i[1])
+            buy_price += i[0] * abs(i[1])
 
         sell_price = self.quantity * self.ohlc["close"]
         notbookedp = sell_price - buy_price
@@ -381,8 +378,8 @@ class Position:
                 self.done_trades.append(i)
                 self.add_quantity(quantity, price)
 
-    def update_ohlc(self,ohlc):
-        
+    def update_ohlc(self, ohlc):
+
         self.ohlc["open"] = ohlc["open"]
         self.ohlc["high"] = ohlc["high"]
         self.ohlc["low"] = ohlc["low"]
@@ -390,7 +387,7 @@ class Position:
         self.check_sl_tk()
         self.execute_trades()
         self.profit
-        
+
 
 if __name__ == "__main__":
     ohlc = {
