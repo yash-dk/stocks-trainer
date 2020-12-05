@@ -176,6 +176,7 @@ class Position:
     def add_quantity(self, quantity, price):
         try:
             res = self.quantity + quantity
+            
             if not self.is_short:
                 if res == 0:
                     # squareoff
@@ -184,6 +185,7 @@ class Position:
                     #self.quantity = 0
                     #self.profit = sell_cap - buy_cap
                     self.booked.append([buy_cap, sell_cap])
+                    self.shares = []
                     pass
                 elif res < 0:
                     # squareoff
@@ -192,6 +194,7 @@ class Position:
                     #self.quantity = 0
                     #self.profit = sell_cap - buy_cap
                     self.booked.append([buy_cap, sell_cap])
+                    self.shares = []
                     messagebox.showerror("Oversold","You sold more quantity then you bought.")
                     pass
                 else:
@@ -221,12 +224,15 @@ class Position:
                                 #self.shares.pop(i)
                                 
                             elif res == 0:
+                                quantity = res
                                 pops.append(self.shares[i])
                                 #self.shares.pop(i)
                                 net_price_sold += self.shares[i][0] * self.shares[i][1]
                             else:
                                 self.shares[i][1] = res
                                 net_price_sold += self.shares[i][0] * abs(quantity)
+                                quantity = 0
+
                         print(net_price_sold,"nps")
                         curr_value_sold = price * abs(bquant)
                         print(curr_value_sold)
@@ -249,17 +255,21 @@ class Position:
             else:
                 if res == 0:
                     # squareoff
-                    buy_cap = self.avg_price * self.quantity
-                    sell_cap = price * self.quantity
-                    self.quantity = 0
-                    self.profit =  buy_cap + sell_cap
+                    buy_cap = self.avg_price * abs(self.quantity)
+                    sell_cap = price * abs(self.quantity)
+                    #self.quantity = 0
+                    #self.profit =  buy_cap + sell_cap
+                    self.booked.append([buy_cap, sell_cap])
+                    self.shares = []
                     pass
                 elif res > 0:
                     # squareoff
-                    buy_cap = self.avg_price * self.quantity
-                    sell_cap = price * self.quantity
-                    self.quantity = 0
-                    self.profit = sell_cap + buy_cap
+                    buy_cap = self.avg_price * abs(self.quantity)
+                    sell_cap = price * abs(self.quantity)
+                    #self.quantity = 0
+                    #self.profit = sell_cap + buy_cap
+                    self.booked.append([buy_cap, sell_cap])
+                    self.shares = []
                     messagebox.showerror("Overbought","You bought more quantity then you sold.")
                     pass
                 else:
@@ -268,6 +278,47 @@ class Position:
                     #self.quantity += quantity
                     #buy_cap -= add_cap
                     #self.avg_price = buy_cap/self.quantity
+
+                    if quantity > 0:
+                        
+                        bquant = quantity
+                        net_price_sold = 0
+                        
+                        pops = []
+                        print(quantity)
+                        for i in range(len(self.shares)):
+                            
+                            res = self.shares[i][1] + quantity
+                            print("res ",res)
+                            if res > 0:
+                                quantity = res
+                                net_price_sold += self.shares[i][0] * abs(self.shares[i][1])
+                                pops.append(self.shares[i])
+                                #self.shares.pop(i)
+                                
+                            elif res == 0:
+                                quantity = res
+                                pops.append(self.shares[i])
+                                #self.shares.pop(i)
+                                net_price_sold += self.shares[i][0] * abs(self.shares[i][1])
+                                print("sold all ", net_price_sold)
+                            else:
+                                
+                                self.shares[i][1] = res
+                                net_price_sold += self.shares[i][0] * abs(quantity)
+                                quantity = 0
+
+                        print(net_price_sold,"nps")
+                        curr_value_sold = price * abs(bquant)
+                        print(curr_value_sold)
+                        self.booked.append([net_price_sold,curr_value_sold])
+                        for i in pops:
+                            print("rm ",i)
+                            self.shares.remove(i)
+                        
+                        self.quantity
+                        self.avg_price
+                        return
 
                     self.shares.append([price, quantity])
                     self.quantity
@@ -313,7 +364,7 @@ class Position:
         for i in self.booked:
             buy_price += i[0]
             sell_price += i[1]
-        
+        print(sell_price, buy_price, " profit")
         return sell_price - buy_price
 
     @property
@@ -373,7 +424,7 @@ if __name__ == "__main__":
     pos = Position(t1)
     print(pos.get_quantity())
     print(pos.get_value())
-    
+    print("")
     pos.update_ohlc(ohlc)
     ohlc = {
             "open":9,
@@ -383,13 +434,14 @@ if __name__ == "__main__":
         }
     print(pos.get_quantity())
     print(pos.get_value())
-    
+    print("")
     t1 = Trade()
     t1.market_order(100)
     pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
     print(pos.get_value())
+    print("")
     ohlc = {
             "open":9,
             "high":21,
@@ -397,12 +449,13 @@ if __name__ == "__main__":
             "close":8
         }
     t1 = Trade(is_sell=True)
-    t1.market_order(102)
+    t1.market_order(50)
     pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
     print(pos.get_value())
     print(pos.get_profit())
+    print("")
     ohlc = {
             "open":9,
             "high":21,
@@ -410,7 +463,7 @@ if __name__ == "__main__":
             "close":7
         }
     t1 = Trade(is_sell=True)
-    t1.market_order(98)
+    t1.market_order(150)
     pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
