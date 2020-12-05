@@ -12,8 +12,10 @@ class App(tk.Frame):
         self.fonts()
         self.tvars()
         self.construct_widget()
-        self.session = Session()
+        self.session = None#Session()
         self.playback_running = False
+        self.current_position = None
+        self.order_type = None
 
     def fonts(self):
         """
@@ -81,17 +83,20 @@ class App(tk.Frame):
         rowcount += 1
 
         # Buy Button
-        tk.Button(self,
+        self.buy_button = tk.Button(self,
                   textvariable=self.buy_label,
-                  font=self.font_esmall
-                  ).grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
+                  font=self.font_esmall,
+                  command=self.buy_button_cmd
+                  )
+        self.buy_button.grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
 
         # Sell Button
-        tk.Button(self,
+        self.sell_button = tk.Button(self,
                   textvariable=self.sell_label,
                   font=self.font_esmall
-                  ).grid(row=rowcount, column=2, columnspan=2, sticky="nsew",
+                  )
+        self.sell_button.grid(row=rowcount, column=2, columnspan=2, sticky="nsew",
                          padx=5, pady=5)
         rowcount += 1
 
@@ -159,7 +164,7 @@ class App(tk.Frame):
 
         # Limit order and Market Order Tabs
         orderstab = ttk.Notebook(self)
-
+        self.orderstab = orderstab
         # Market Tab
         markettab = ttk.Frame(orderstab)
         # Limit Tab
@@ -185,8 +190,9 @@ class App(tk.Frame):
                  ).grid(row=1, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        tk.Entry(markettab
-                 ).grid(row=1, column=1,  columnspan=2, sticky="nsew",
+        self.moquantity = tk.Entry(markettab)
+        
+        self.moquantity.grid(row=1, column=1,  columnspan=2, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Button(markettab,
@@ -199,8 +205,10 @@ class App(tk.Frame):
                  ).grid(row=2, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        tk.Entry(markettab
-                 ).grid(row=2, column=1,  columnspan=3, sticky="nsew",
+        self.motakep = tk.Entry(markettab
+                 )
+                 
+        self.motakep.grid(row=2, column=1,  columnspan=3, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Label(markettab,
@@ -208,8 +216,9 @@ class App(tk.Frame):
                  ).grid(row=3, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        tk.Entry(markettab
-                 ).grid(row=3, column=1,  columnspan=3, sticky="nsew",
+        self.mostopl = tk.Entry(markettab
+                 )
+        self.mostopl.grid(row=3, column=1,  columnspan=3, sticky="nsew",
                         padx=5, pady=5)
 
         # Configure Limit Tab
@@ -225,8 +234,9 @@ class App(tk.Frame):
                  ).grid(row=1, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        tk.Entry(limittab
-                 ).grid(row=1, column=1,  columnspan=3, sticky="nsew",
+        self.loorderp = tk.Entry(limittab
+                 )
+        self.loorderp.grid(row=1, column=1,  columnspan=3, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Label(limittab,
@@ -234,8 +244,9 @@ class App(tk.Frame):
                  ).grid(row=2, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        tk.Entry(limittab
-                 ).grid(row=2, column=1,  columnspan=3, sticky="nsew",
+        self.loquantity = tk.Entry(limittab
+                 )
+        self.loquantity.grid(row=2, column=1,  columnspan=3, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Label(limittab,
@@ -243,8 +254,9 @@ class App(tk.Frame):
                  ).grid(row=3, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        tk.Entry(limittab
-                 ).grid(row=3, column=1,  columnspan=3, sticky="nsew",
+        self.lotakep = tk.Entry(limittab
+                 )
+        self.lotakep.grid(row=3, column=1,  columnspan=3, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Label(limittab,
@@ -252,8 +264,9 @@ class App(tk.Frame):
                  ).grid(row=4, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        tk.Entry(limittab
-                 ).grid(row=4, column=1,  columnspan=3, sticky="nsew",
+        self.lostopl = tk.Entry(limittab
+                 )
+        self.lostopl.grid(row=4, column=1,  columnspan=3, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Button(self,
@@ -288,6 +301,19 @@ class App(tk.Frame):
         positions.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         positions.insert(tk.END, "..")
     
+
+    def buy_button_cmd(self):
+        #self.buy_button.configure(bg = "#4287f5")
+        
+        tabindex = self.orderstab.index(self.orderstab.select())
+        if tabindex == 0:
+            self.order_type = "market"
+        elif tabindex == 1:
+            self.order_type = "limit"
+            
+        
+
+
     def fetch(self):
         name = self.session.get_name()
         self.symbol.set(name)
@@ -305,6 +331,7 @@ class App(tk.Frame):
             self.low_label.set("Low\n{}".format(ohlc["low"]))
             self.buy_label.set("Buy\n{}".format(ohlc["close"]))
             self.sell_label.set("Sell\n{}".format(ohlc["close"]))
+            
         if self.playback_running:
             self.after(200,self.routine_task)
 
