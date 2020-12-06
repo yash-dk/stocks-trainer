@@ -3,7 +3,7 @@ import traceback
 import xpath
 from tkinter import messagebox
 
-
+# TODO fix the avg value i think its broken
 
 class Session:
     """This class represents a user session of trading.
@@ -150,7 +150,7 @@ class Position:
     """This class represents a position taken by user.
     """
 
-    def __init__(self, trade):
+    def __init__(self, trade, session = None):
         self.pending_trades = [trade]
         self.done_trades = []
         self.ohlc = {
@@ -168,6 +168,7 @@ class Position:
         self.status = True
         self.shares = []
         self.booked = []
+        self.session = None
 
     def add_trade(self, trade):
         if isinstance(trade, Trade):
@@ -186,6 +187,7 @@ class Position:
 
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
+                    self.status = False
                     pass
                 elif res < 0:
                     # squareoff
@@ -194,6 +196,7 @@ class Position:
 
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
+                    self.status = False
                     messagebox.showerror("Oversold", "You sold more quantity then you bought.")
                     pass
                 else:
@@ -245,6 +248,7 @@ class Position:
                     sell_cap = price * abs(self.quantity)
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
+                    self.status = False
                     pass
                 elif res > 0:
                     # squareoff
@@ -252,6 +256,7 @@ class Position:
                     sell_cap = price * abs(self.quantity)
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
+                    self.status = False
                     messagebox.showerror("Overbought", "You bought more quantity then you sold.")
                     pass
                 else:
@@ -360,11 +365,21 @@ class Position:
     def check_sl_tk(self):
         if self.stop_loss is not None:
             if self.stop_loss <= self.ohlc["high"] and self.stop_loss >= self.ohlc["low"]:
+                buy_cap = self.avg_price * abs(self.quantity)
+                sell_cap = self.stop_loss * abs(self.quantity)
+                self.booked.append([buy_cap, sell_cap])
+                self.shares = []
+                self.status = False
                 messagebox.showinfo("Stop Loss","Stop loss hit.")
                 print("sl hit")
 
         if self.take_profit is not None:
             if self.take_profit <= self.ohlc["high"] and self.take_profit >= self.ohlc["low"]:
+                buy_cap = self.avg_price * abs(self.quantity)
+                sell_cap = self.take_profit * abs(self.quantity)
+                self.booked.append([buy_cap, sell_cap])
+                self.shares = []
+                self.status = False
                 messagebox.showinfo("Profit","Profit booked at take profit.")
                 print("profit")
 
