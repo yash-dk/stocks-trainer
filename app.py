@@ -14,6 +14,9 @@ class App(tk.Frame):
         self.tvars()
         self.bg_color = "#121212"
         self.fg_color = "#ffffff"
+        self.down_color = "#ef5350"
+        self.up_color = "#26a69a"
+        self.active_color = "#444444"
         self.configure(bg=self.bg_color)
         self.construct_widget()
         self.session = Session()
@@ -21,6 +24,8 @@ class App(tk.Frame):
         self.current_position = None
         self.order_type = None
         self.order_side = None
+        self.done_positions = []
+        
         
     def fonts(self):
         """
@@ -107,7 +112,8 @@ class App(tk.Frame):
                                      textvariable=self.sell_label,
                                      font=self.font_esmall,
                                      bg=self.bg_color,
-                                     fg=self.fg_color
+                                     fg=self.fg_color,
+                                     command=self.sell_button_cmd
                                      )
         self.sell_button.grid(row=rowcount, column=2, columnspan=2, 
                               sticky="nsew", padx=5, pady=5)
@@ -193,7 +199,7 @@ class App(tk.Frame):
 
         # Limit order and Market Order Tabs
         bstyle = ttk.Style()
-        # bstyle.configure('W.TNotebook', background=self.bg_color)
+        
         bstyle.theme_create("darknb", "alt", {
             "TNotebook": {
                 "configure": {
@@ -380,14 +386,25 @@ class App(tk.Frame):
                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         rowcount += 1
 
-        positions = tk.Listbox(self, height=3, bg=self.bg_color,
+        self.positions_lb = tk.Listbox(self, height=3, bg=self.bg_color,
                                fg=self.fg_color)
-        positions.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
-        positions.insert(tk.END, "..")
+        self.positions_lb.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
+        #self.positions_lb.insert(tk.END, "..")
     
     def buy_button_cmd(self):
-        #self.buy_button.configure(bg = "#4287f5")
+        self.buy_button.configure(bg = self.up_color)
+        self.sell_button.configure(bg = self.bg_color)
         self.order_side = "buy"
+        tabindex = self.orderstab.index(self.orderstab.select())
+        if tabindex == 0:
+            self.order_type = "market"
+        elif tabindex == 1:
+            self.order_type = "limit"
+
+    def sell_button_cmd(self):
+        self.buy_button.configure(bg = self.bg_color)
+        self.sell_button.configure(bg = self.down_color)
+        self.order_side = "sell"
         tabindex = self.orderstab.index(self.orderstab.select())
         if tabindex == 0:
             self.order_type = "market"
@@ -395,14 +412,75 @@ class App(tk.Frame):
             self.order_type = "limit"
             
     def place_order(self):
-        if self.order_side == "buy":
-            print("in buy")
-            if self.order_type == "market":
-                print("in marekt")
-                if self.current_position is None:
-                    trd = Trade()
-                    trd.market_order(int(self.moquantity.get()), int(self.motakep.get()), int(self.mostopl.get()))
-                    self.current_position = Position(trd)
+        self.clear_position()
+        tabindex = self.orderstab.index(self.orderstab.select())
+        if tabindex == 0:
+            self.order_type = "market"
+        elif tabindex == 1:
+            self.order_type = "limit"
+
+        if self.order_type == "market":
+            print("in marekt")
+            
+            if self.order_side == "buy":
+                trd = Trade()
+            elif self.order_side == "sell":
+                trd = Trade(is_sell=Trade)
+            else:
+                return
+            try:
+                quantitiy = int(self.moquantity.get())
+
+                if self.motakep.get().strip():
+                    takep = int(self.motakep.get())
+                else:
+                    takep = None
+    
+                if self.mostopl.get().strip():
+                    stopl = int(self.mostopl.get())
+                else:
+                    stopl = None
+            except:
+                tk.messagebox.showerror("Value Error", "All the inputs must be Integers.")
+                return
+
+            trd.market_order(quantitiy, takep, stopl)
+            if self.current_position is None:
+                self.current_position = Position(trd)
+            else:
+                self.current_position.add_trade(trd)
+        else:
+            print("inlimit")
+            
+            if self.order_side == "buy":
+                trd = Trade()
+            elif self.order_side == "sell":
+                trd = Trade(is_sell=Trade)
+            else:
+                return
+
+            try:
+                quantitiy = int(self.loquantity.get())
+    
+                if self.lotakep.get().strip():
+                    takep = int(self.lotakep.get())
+                else:
+                    takep = None
+                if self.lostopl.get().strip():
+                    stopl = int(self.lostopl.get())
+                else:
+                    stopl = None
+
+                limit = int(self.loorderp.get())
+            except:
+                tk.messagebox.showerror("Value Error", "All the inputs must be Integers.")
+                return
+            
+            trd.limit_order(quantitiy, limit, takep, stopl)
+            if self.current_position is None:
+                self.current_position = Position(trd)
+            else:
+                self.current_position.add_trade(trd)
 
     def fetch(self):
         name = self.session.get_name()
@@ -422,11 +500,34 @@ class App(tk.Frame):
             self.sell_label.set("Sell\n{}".format(ohlc["close"]))
 
             if self.current_position is not None:
+                self.update_trades()
                 self.current_position.update_ohlc(ohlc)
-                self.position_str.set("Long {} @{} Q.{} pnl.{}".format(self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.get_profit()))
+                if self.current_position.is_short:
+                    typee = "Short"
+                else:
+                    typee = "Long"
+                self.position_str.set("{} {} @{} Q.{}\npnl.{}".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.get_profit()))
             
         if self.playback_running:
             self.after(200, self.routine_task)
+
+    def update_trades(self):
+        if self.current_position is not None:
+            self.positions_lb.delete(0,tk.END)
+            self.positions_lb.insert(tk.END, "Pending")
+            for i in self.current_position.pending_trades:
+                self.positions_lb.insert(tk.END, str(i))
+            self.positions_lb.insert(tk.END, "Done")
+            for i in self.current_position.done_trades:
+                self.positions_lb.insert(tk.END, str(i))
+            
+
+    def clear_position(self):
+        if self.current_position is not None:
+            if not self.current_position.status:
+                self.done_positions.append(self.current_position)
+                self.current_position = None
+                self.position_str.set("No Position")
 
     def replay(self):
         self.session.click_replay()
@@ -449,7 +550,7 @@ class App(tk.Frame):
 
 root = tk.Tk()
 root.title('Trainer')
-
+root.attributes('-topmost', True)
 app = App(root)
 app.configure()
 app.mainloop()

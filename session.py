@@ -17,13 +17,13 @@ class Session:
             self.driver.get("https://www.tradingview.com/#signin")
         except Exception as e:
             print("Error in chromedriver.")
-            print(traceback.format_exc(e))
+            #print(traceback.format_exc(e))
 
     def demo(self):
         pass
 
     def show_error(self, exception, message="Report the issue on github."):
-        print(traceback.format_exc(exception))
+        #print(traceback.format_exc(exception))
         messagebox.showerror(str(exception), str(exception)+message)
 
     def get_ohlc(self):
@@ -110,6 +110,7 @@ class Trade:
     def __init__(self, ohlc=None, is_sell=False):
         self.ohlc = ohlc
         self.is_sell = is_sell
+        self.taken_price = None
 
     def market_order(self, quantity, take_profit=None, stop_loss=None):
         self.mo = True
@@ -135,6 +136,7 @@ class Trade:
     def execute(self):
         if self.ohlc is not None:
             if self.mo:
+                self.taken_price = self.ohlc["close"]
                 return self.quantity, self.ohlc["close"]
             elif self.lo:
                 if (self.limit <= self.ohlc["high"]
@@ -145,6 +147,21 @@ class Trade:
     def link_ohlc(self, ohlc):
         self.ohlc = ohlc
 
+    def __str__(self):
+        retst = ""
+        if self.is_sell:
+            retst += "Short @ "
+        else:
+            retst += "Long @ "
+
+        if self.mo:
+            retst += str(self.taken_price) + "[MO]"
+        else:
+            retst += str(self.limit) + "[LO]"
+
+        retst += " Q."+str(abs(self.quantity))
+        
+        return retst
 
 class Position:
     """This class represents a position taken by user.
@@ -306,7 +323,7 @@ class Position:
 
         except Exception as e:
             print("excp", e)
-            print(traceback.format_exc(e))
+            #print(traceback.format_exc(e))
             pass
 
     def get_value(self):
@@ -343,7 +360,8 @@ class Position:
         for i in self.shares:
             buy_price += i[0] * abs(i[1])
 
-        sell_price = self.quantity * self.ohlc["close"]
+        sell_price = abs(self.quantity) * self.ohlc["close"]
+        
         notbookedp = sell_price - buy_price
 
         return notbookedp+bookedp
@@ -394,7 +412,8 @@ class Position:
                 self.add_quantity(quantity, price)
 
     def update_ohlc(self, ohlc):
-
+        if not self.status:
+            return
         self.ohlc["open"] = ohlc["open"]
         self.ohlc["high"] = ohlc["high"]
         self.ohlc["low"] = ohlc["low"]
@@ -426,10 +445,11 @@ if __name__ == "__main__":
         }
     print(pos.get_quantity())
     print(pos.get_value())
+    print(pos.get_profit(),"here")
     print("")
     t1 = Trade()
     t1.market_order(50)
-    pos.add_trade(t1)
+    #pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
     print(pos.get_value())
@@ -443,7 +463,7 @@ if __name__ == "__main__":
         }
     t1 = Trade(is_sell=True)
     t1.market_order(100)
-    pos.add_trade(t1)
+    #pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
     print(pos.get_value())
@@ -456,12 +476,12 @@ if __name__ == "__main__":
             "close":7
         }
     t1 = Trade()
-    t1.market_order(150)
+    t1.market_order(100)
     pos.add_trade(t1)
     pos.update_ohlc(ohlc)
     print(pos.get_quantity())
     print(pos.get_value())
     print(pos.get_profit())
-    print(pos.done_trades)
+    [print(i) for i in pos.done_trades]
     # t1.limit_order(100,17)
 
