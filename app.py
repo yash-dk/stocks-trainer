@@ -3,6 +3,7 @@ from tkinter import ttk
 import tkinter.font as tkFont
 from session import Session, Position, Trade
 
+
 class App(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -15,13 +16,12 @@ class App(tk.Frame):
         self.fg_color = "#ffffff"
         self.configure(bg=self.bg_color)
         self.construct_widget()
-        self.session = None#Session()
+        self.session = Session()
         self.playback_running = False
         self.current_position = None
         self.order_type = None
         self.order_side = None
         
-
     def fonts(self):
         """
             Create standard font sizes.
@@ -64,7 +64,6 @@ class App(tk.Frame):
         self.play_pause_label.set("▶")
         self.position_str = tk.StringVar()
         
-
     def construct_widget(self):
         # Main GUI
         rowcount = 0
@@ -94,24 +93,24 @@ class App(tk.Frame):
 
         # Buy Button
         self.buy_button = tk.Button(self,
-                  textvariable=self.buy_label,
-                  font=self.font_esmall,
-                  command=self.buy_button_cmd,
-                  bg=self.bg_color,
-                 fg=self.fg_color
-                  )
-        self.buy_button.grid(row=rowcount, column=0, columnspan=2, sticky="nsew",
-                         padx=5, pady=5)
+                                    textvariable=self.buy_label,
+                                    font=self.font_esmall,
+                                    command=self.buy_button_cmd,
+                                    bg=self.bg_color,
+                                    fg=self.fg_color
+                                    )
+        self.buy_button.grid(row=rowcount, column=0, columnspan=2, 
+                             sticky="nsew", padx=5, pady=5)
 
         # Sell Button
         self.sell_button = tk.Button(self,
-                  textvariable=self.sell_label,
-                  font=self.font_esmall,
-                  bg=self.bg_color,
-                  fg=self.fg_color
-                  )
-        self.sell_button.grid(row=rowcount, column=2, columnspan=2, sticky="nsew",
-                         padx=5, pady=5)
+                                     textvariable=self.sell_label,
+                                     font=self.font_esmall,
+                                     bg=self.bg_color,
+                                     fg=self.fg_color
+                                     )
+        self.sell_button.grid(row=rowcount, column=2, columnspan=2, 
+                              sticky="nsew", padx=5, pady=5)
         rowcount += 1
 
         ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
@@ -164,28 +163,28 @@ class App(tk.Frame):
 
         # OHLC Data of surrent candle
         tk.Label(self,
-                  textvariable=self.open_label,
-                  bg=self.bg_color,
-                  fg=self.fg_color
-                  ).grid(row=rowcount, column=0, columnspan=1, sticky="nsew")
+                 textvariable=self.open_label,
+                 bg=self.bg_color,
+                 fg=self.fg_color
+                 ).grid(row=rowcount, column=0, columnspan=1, sticky="nsew")
 
         tk.Label(self,
-                  textvariable=self.close_label,
-                  bg=self.bg_color,
-                  fg=self.fg_color
-                  ).grid(row=rowcount, column=1, columnspan=1, sticky="nsew")
+                 textvariable=self.close_label,
+                 bg=self.bg_color,
+                 fg=self.fg_color
+                 ).grid(row=rowcount, column=1, columnspan=1, sticky="nsew")
 
         tk.Label(self,
-                  textvariable=self.high_label,
-                  bg=self.bg_color,
-                  fg=self.fg_color
-                  ).grid(row=rowcount, column=2, columnspan=1, sticky="nsew")
+                 textvariable=self.high_label,
+                 bg=self.bg_color,
+                 fg=self.fg_color
+                 ).grid(row=rowcount, column=2, columnspan=1, sticky="nsew")
 
         tk.Label(self,
-                  textvariable=self.low_label,
-                  bg=self.bg_color,
-                  fg=self.fg_color
-                  ).grid(row=rowcount, column=3, columnspan=1, sticky="nsew")
+                 textvariable=self.low_label,
+                 bg=self.bg_color,
+                 fg=self.fg_color
+                 ).grid(row=rowcount, column=3, columnspan=1, sticky="nsew")
         rowcount += 1
 
         ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
@@ -194,27 +193,28 @@ class App(tk.Frame):
 
         # Limit order and Market Order Tabs
         bstyle = ttk.Style()
-        #bstyle.configure('W.TNotebook', background=self.bg_color)
+        # bstyle.configure('W.TNotebook', background=self.bg_color)
         bstyle.theme_create("darknb", "alt", {
-            "TNotebook":{
-                "configure":{
-                    "background":self.bg_color,
-                    "foreground":self.fg_color,
-                    "padding":[5,5]
+            "TNotebook": {
+                "configure": {
+                    "background": self.bg_color,
+                    "foreground": self.fg_color,
+                    "padding": [5, 5]
                 }
             },
-            "TNotebook.Tab":{
-                "configure":{
-                    "background":self.bg_color,
-                    "foreground":self.fg_color,
-                    "font":self.font_esmall,
-                    "padding":[6,6]
+            "TNotebook.Tab": {
+                "configure": {
+                    "background": self.bg_color,
+                    "foreground": self.fg_color,
+                    "font": self.font_esmall,
+                    "padding": [6, 6]
                 },
-                "map":       {"background": [("selected", self.fg_color)],"foreground": [("selected", self.bg_color)]}
+                "map": {"background": [("selected", self.fg_color)], 
+                        "foreground": [("selected", self.bg_color)]}
             },
-            "TSeparator":{
-                "configure":{
-                    "background":self.fg_color
+            "TSeparator": {
+                "configure": {
+                    "background": self.fg_color
                 }
             }
         })
@@ -224,10 +224,10 @@ class App(tk.Frame):
         self.orderstab = orderstab
         # Market Tab
         markettab = tk.Frame(orderstab,
-                  background=self.bg_color)
+                             background=self.bg_color)
         # Limit Tab
         limittab = tk.Frame(orderstab,
-                  background=self.bg_color)
+                            background=self.bg_color)
 
         orderstab.add(markettab, text="Market")
         orderstab.add(limittab, text="Limit")
@@ -241,23 +241,23 @@ class App(tk.Frame):
         tk.Label(markettab,
                  text="MARKET ORDER",
                  font=self.font_esmall,
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                   
                  ).grid(row=0, column=0,  columnspan=4, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Label(markettab,
                  text="Quantity",
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=1, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
         self.moquantity = tk.Entry(markettab)
         
-        self.moquantity.grid(row=1, column=1,  columnspan=2, sticky="nsew",
-                        padx=5, pady=5)
+        self.moquantity.grid(row=1, column=1,  columnspan=2, 
+                             sticky="nsew", padx=5, pady=5)
 
         tk.Button(markettab,
                   text="MAX",
@@ -268,86 +268,80 @@ class App(tk.Frame):
 
         tk.Label(markettab,
                  text="Take Profit",
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=2, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        self.motakep = tk.Entry(markettab
-                 )
+        self.motakep = tk.Entry(markettab)
                  
-        self.motakep.grid(row=2, column=1,  columnspan=3, sticky="nsew",
-                        padx=5, pady=5)
+        self.motakep.grid(row=2, column=1,  columnspan=3, 
+                          sticky="nsew", padx=5, pady=5)
 
         tk.Label(markettab,
                  text="Stop Loss",
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=3, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        self.mostopl = tk.Entry(markettab
-                 )
-        self.mostopl.grid(row=3, column=1,  columnspan=3, sticky="nsew",
-                        padx=5, pady=5)
+        self.mostopl = tk.Entry(markettab)
+        self.mostopl.grid(row=3, column=1,  columnspan=3,
+                          sticky="nsew", padx=5, pady=5)
 
         # Configure Limit Tab
         limittab.grid_columnconfigure(1, weight=1)
         tk.Label(limittab,
                  text="LIMIT ORDER",
                  font=self.font_esmall,
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=0, column=0,  columnspan=4, sticky="nsew",
                         padx=5, pady=5)
 
         tk.Label(limittab,
                  text="Order Price",
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=1, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        self.loorderp = tk.Entry(limittab
-                 )
-        self.loorderp.grid(row=1, column=1,  columnspan=3, sticky="nsew",
-                        padx=5, pady=5)
+        self.loorderp = tk.Entry(limittab)
+        self.loorderp.grid(row=1, column=1,  columnspan=3,
+                           sticky="nsew", padx=5, pady=5)
 
         tk.Label(limittab,
                  text="Quantity",
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=2, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        self.loquantity = tk.Entry(limittab
-                 )
-        self.loquantity.grid(row=2, column=1,  columnspan=3, sticky="nsew",
-                        padx=5, pady=5)
+        self.loquantity = tk.Entry(limittab)
+        self.loquantity.grid(row=2, column=1,  columnspan=3,
+                             sticky="nsew", padx=5, pady=5)
 
         tk.Label(limittab,
                  text="Take Profit",
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=3, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        self.lotakep = tk.Entry(limittab
-                 )
-        self.lotakep.grid(row=3, column=1,  columnspan=3, sticky="nsew",
-                        padx=5, pady=5)
+        self.lotakep = tk.Entry(limittab)
+        self.lotakep.grid(row=3, column=1,  columnspan=3,
+                          sticky="nsew", padx=5, pady=5)
 
         tk.Label(limittab,
                  text="Stop Loss",
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=4, column=0,  columnspan=1, sticky="nsew",
                         padx=5, pady=5)
 
-        self.lostopl = tk.Entry(limittab
-                 )
-        self.lostopl.grid(row=4, column=1,  columnspan=3, sticky="nsew",
-                        padx=5, pady=5)
+        self.lostopl = tk.Entry(limittab)
+        self.lostopl.grid(row=4, column=1,  columnspan=3,
+                          sticky="nsew", padx=5, pady=5)
 
         tk.Button(self,
                   text="Place Order",
@@ -365,14 +359,14 @@ class App(tk.Frame):
         # Positions
 
         tk.Label(self, text="Positions", font=self.font_esmall,
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         rowcount += 1
 
         tk.Label(self, textvariable=self.position_str,
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=rowcount, column=0, columnspan=4, sticky="w")
         rowcount += 1
 
@@ -381,18 +375,16 @@ class App(tk.Frame):
         rowcount += 1
 
         tk.Label(self, text="Trade History", font=self.font_esmall,
-                  bg=self.bg_color,
-                  fg=self.fg_color
+                 bg=self.bg_color,
+                 fg=self.fg_color
                  ).grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         rowcount += 1
 
-        positions = tk.Listbox(self, height=3,
-                  bg=self.bg_color,
-                  fg=self.fg_color)
+        positions = tk.Listbox(self, height=3, bg=self.bg_color,
+                               fg=self.fg_color)
         positions.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         positions.insert(tk.END, "..")
     
-
     def buy_button_cmd(self):
         #self.buy_button.configure(bg = "#4287f5")
         self.order_side = "buy"
@@ -412,13 +404,11 @@ class App(tk.Frame):
                     trd.market_order(int(self.moquantity.get()), int(self.motakep.get()), int(self.mostopl.get()))
                     self.current_position = Position(trd)
 
-
     def fetch(self):
         name = self.session.get_name()
         self.symbol.set(name)
         fname = self.session.get_fname()
         self.symbol_name.set(fname)
-
 
     def routine_task(self):
         ohlc = self.session.get_ohlc()
@@ -436,7 +426,7 @@ class App(tk.Frame):
                 self.position_str.set("Long {} @{} Q.{} pnl.{}".format(self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.get_profit()))
             
         if self.playback_running:
-            self.after(200,self.routine_task)
+            self.after(200, self.routine_task)
 
     def replay(self):
         self.session.click_replay()
