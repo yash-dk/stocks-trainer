@@ -9,6 +9,7 @@ class App(tk.Frame):
         super().__init__(master)
         self.master = master
         self.master.configure(background="#121212")
+        self.session = Session()
         self.pack()
         self.fonts()
         self.tvars()
@@ -17,9 +18,10 @@ class App(tk.Frame):
         self.down_color = "#ef5350"
         self.up_color = "#26a69a"
         self.active_color = "#444444"
+        
         self.configure(bg=self.bg_color)
         self.construct_widget()
-        self.session = Session()
+        
         self.playback_running = False
         self.current_position = None
         self.order_type = None
@@ -68,6 +70,8 @@ class App(tk.Frame):
         self.play_pause_label = tk.StringVar()
         self.play_pause_label.set("▶")
         self.position_str = tk.StringVar()
+        self.acc_val_lab = tk.StringVar()
+        self.acc_val_lab.set("Account Value: {} +0.0%".format(self.session.account_value))
         
     def construct_widget(self):
         # Main GUI
@@ -362,6 +366,17 @@ class App(tk.Frame):
                                  sticky="nsew")
         rowcount += 1
 
+        # Acc value
+        tk.Label(self, textvariable=self.acc_val_lab, font=self.font_esmall,
+                 bg=self.bg_color,
+                 fg=self.fg_color,
+                 ).grid(row=rowcount, column=0, columnspan=4, sticky="nw")
+        rowcount += 1
+
+        ttk.Separator(self).grid(row=rowcount, column=0, columnspan=4,
+                                 sticky="nsew")
+        rowcount += 1
+
         # Positions
 
         tk.Label(self, text="Positions", font=self.font_esmall,
@@ -446,7 +461,7 @@ class App(tk.Frame):
 
             trd.market_order(quantitiy, takep, stopl)
             if self.current_position is None:
-                self.current_position = Position(trd)
+                self.current_position = Position(trd, self.session)
             else:
                 self.current_position.add_trade(trd)
         else:
@@ -478,7 +493,7 @@ class App(tk.Frame):
             
             trd.limit_order(quantitiy, limit, takep, stopl)
             if self.current_position is None:
-                self.current_position = Position(trd)
+                self.current_position = Position(trd, self.session)
             else:
                 self.current_position.add_trade(trd)
 
@@ -490,6 +505,7 @@ class App(tk.Frame):
 
     def routine_task(self):
         ohlc = self.session.get_ohlc()
+        
         if ohlc is not None:
 
             self.open_label.set("Open\n{}".format(ohlc["open"]))
@@ -498,6 +514,16 @@ class App(tk.Frame):
             self.low_label.set("Low\n{}".format(ohlc["low"]))
             self.buy_label.set("Buy\n{}".format(ohlc["close"]))
             self.sell_label.set("Sell\n{}".format(ohlc["close"]))
+            try:
+                perc = self.session.account_value / self.session.account_start
+                perc -= 1
+                if perc >= 0:
+                    perc = round(perc*100,3)
+                    self.acc_val_lab.set("Account value: {} +{}".format(self.session.account_value, perc))
+                else:
+                    self.acc_val_lab.set("Account value: {} -{}".format(self.session.account_value, perc))
+            except:
+                self.acc_val_lab.set("Error")
 
             if self.current_position is not None:
                 self.update_trades()
@@ -506,7 +532,7 @@ class App(tk.Frame):
                     typee = "Short"
                 else:
                     typee = "Long"
-                self.position_str.set("{} {} @{} Q.{}\npnl.{}".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.get_profit()))
+                self.position_str.set("{} {} @{} Q.{}\nPnL.{}".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.get_profit()))
             
         if self.playback_running:
             self.after(200, self.routine_task)
