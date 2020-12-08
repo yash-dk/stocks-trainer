@@ -392,6 +392,18 @@ class Position:
         return notbookedp+bookedp
 
     @property
+    def invested_amount(self):
+        buy_price = 0
+        for i in self.booked:
+            buy_price += i[0]
+
+        buy_price1 = 0
+        for i in self.shares:
+            buy_price1 += i[0] * abs(i[1])
+
+        return buy_price + buy_price1
+
+    @property
     def avg_price(self):
         avg = 0
         total_price = 0

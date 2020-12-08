@@ -532,7 +532,8 @@ class App(tk.Frame):
                     typee = "Short"
                 else:
                     typee = "Long"
-                self.position_str.set("{} {} @{} Q.{}\nPnL.{}".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.get_profit()))
+                percent = round((self.current_position.get_profit() / self.current_position.invested_amount) * 100, 2)
+                self.position_str.set("{} {} @{} Q.{}\nInv.{} PnL.{} {}%".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(),self.current_position.invested_amount , round(self.current_position.get_profit(), 2), percent))
             
         if self.session.check_last_bar():
             self.session.click_pause_play()
@@ -576,10 +577,11 @@ class App(tk.Frame):
 
     
 
-
-root = tk.Tk()
-root.title('Trainer')
-root.attributes('-topmost', True)
-app = App(root)
-app.configure()
-app.mainloop()
+if __name__ == "__main__":
+    
+    root = tk.Tk()
+    root.title('Trainer')
+    root.attributes('-topmost', True)
+    app = App(root)
+    app.configure()
+    app.mainloop()
