@@ -402,7 +402,7 @@ class App(tk.Frame):
         rowcount += 1
 
         self.positions_lb = tk.Listbox(self, height=3, bg=self.bg_color,
-                               fg=self.fg_color)
+                                       fg=self.fg_color)
         self.positions_lb.grid(row=rowcount, column=0, columnspan=4, sticky="nsew")
         #self.positions_lb.insert(tk.END, "..")
     
@@ -518,7 +518,7 @@ class App(tk.Frame):
                 perc = self.session.account_value / self.session.account_start
                 perc -= 1
                 if perc >= 0:
-                    perc = round(perc*100,3)
+                    perc = round(perc*100, 3)
                     self.acc_val_lab.set("Account value: {} +{}".format(self.session.account_value, perc))
                 else:
                     self.acc_val_lab.set("Account value: {} -{}".format(self.session.account_value, perc))
@@ -533,7 +533,7 @@ class App(tk.Frame):
                 else:
                     typee = "Long"
                 percent = round((self.current_position.get_profit() / self.current_position.invested_amount) * 100, 2)
-                self.position_str.set("{} {} @{} Q.{}\nInv.{} PnL.{} {}%".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(),self.current_position.invested_amount , round(self.current_position.get_profit(), 2), percent))
+                self.position_str.set("{} {} @{} Q.{}\nInv.{} PnL.{} {}%".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.invested_amount , round(self.current_position.get_profit(), 2), percent))
             
         if self.session.check_last_bar():
             self.session.click_pause_play()
@@ -543,7 +543,7 @@ class App(tk.Frame):
 
     def update_trades(self):
         if self.current_position is not None:
-            self.positions_lb.delete(0,tk.END)
+            self.positions_lb.delete(0, tk.END)
             self.positions_lb.insert(tk.END, "Pending")
             for i in self.current_position.pending_trades:
                 self.positions_lb.insert(tk.END, str(i))
@@ -551,7 +551,6 @@ class App(tk.Frame):
             for i in self.current_position.done_trades:
                 self.positions_lb.insert(tk.END, str(i))
             
-
     def clear_position(self):
         if self.current_position is not None:
             if not self.current_position.status:
@@ -575,7 +574,6 @@ class App(tk.Frame):
         self.session.click_fwd_bar()
         self.routine_task()
 
-    
 
 if __name__ == "__main__":
     
