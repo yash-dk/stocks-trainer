@@ -435,7 +435,7 @@ class App(tk.Frame):
             self.order_type = "limit"
 
         if self.order_type == "market":
-            print("in marekt")
+            print("in market")
             
             if self.order_side == "buy":
                 trd = Trade()

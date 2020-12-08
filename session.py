@@ -440,7 +440,6 @@ class Position:
                 self.shares = []
                 if self.session is not None:
                         self.session.account_value += self.get_profit()
-                        print("updated ", self.session.account_value)
                         self.session.click_pause_play()
                 
                 self.status = False
@@ -470,64 +469,5 @@ class Position:
 
 
 if __name__ == "__main__":
-    ohlc = {
-            "open":10,
-            "high":12,
-            "low":8,
-            "close":9
-        }
-    t1 = Trade(is_sell=True)
-    t1.market_order(100)
-    pos = Position(t1)
-    print(pos.get_quantity())
-    print(pos.get_value())
-    print("")
-    pos.update_ohlc(ohlc)
-    ohlc = {
-            "open":9,
-            "high":21,
-            "low":9,
-            "close":10
-        }
-    print(pos.get_quantity())
-    print(pos.get_value())
-    print(pos.get_profit(),"here")
-    print("")
-    t1 = Trade()
-    t1.market_order(50)
-    #pos.add_trade(t1)
-    pos.update_ohlc(ohlc)
-    print(pos.get_quantity())
-    print(pos.get_value())
-    print(pos.get_profit(),"here")
-    print("")
-    ohlc = {
-            "open":9,
-            "high":21,
-            "low":9,
-            "close":8
-        }
-    t1 = Trade(is_sell=True)
-    t1.market_order(100)
-    #pos.add_trade(t1)
-    pos.update_ohlc(ohlc)
-    print(pos.get_quantity())
-    print(pos.get_value())
-    print(pos.get_profit())
-    print("")
-    ohlc = {
-            "open":9,
-            "high":21,
-            "low":9,
-            "close":7
-        }
-    t1 = Trade()
-    t1.market_order(100)
-    pos.add_trade(t1)
-    pos.update_ohlc(ohlc)
-    print(pos.get_quantity())
-    print(pos.get_value())
-    print(pos.get_profit())
-    [print(i) for i in pos.done_trades]
-    # t1.limit_order(100,17)
+    pass
 
