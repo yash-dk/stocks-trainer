@@ -29,6 +29,7 @@ class Session:
         messagebox.showerror(str(exception), str(exception)+message)
 
     def get_ohlc(self):
+        
         ohlc = {}
         try:
             elem = self.driver.find_element_by_xpath(xpath.OPEN)
@@ -52,7 +53,7 @@ class Session:
             low = float(low)
             close = float(close)
         except Exception as e:
-            self.show_error(e)
+            #self.show_error(e)
             return None
 
         ohlc["open"] = open_
@@ -94,6 +95,16 @@ class Session:
         except Exception as e:
             self.show_error(e)
             return False
+
+    def check_last_bar(self):
+        try:
+
+            x = self.driver.execute_script(xpath.LAST_BAR_CHECK)
+            
+            return x
+        except Exception as e:
+            self.show_error(e)
+            return None
 
     def click_fwd_bar(self):
         try:

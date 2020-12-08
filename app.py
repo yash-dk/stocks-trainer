@@ -534,6 +534,9 @@ class App(tk.Frame):
                     typee = "Long"
                 self.position_str.set("{} {} @{} Q.{}\nPnL.{}".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.get_profit()))
             
+        if self.session.check_last_bar():
+            self.session.click_pause_play()
+            self.playback_running = False
         if self.playback_running:
             self.after(200, self.routine_task)
 
