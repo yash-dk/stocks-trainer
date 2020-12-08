@@ -1,0 +1,6 @@
+colorama==0.4.3
+PyAutoGUI==0.9.52
+PyGetWindow==0.0.9
+PyMsgBox==1.0.9
+pynput==1.7.1
+selenium==3.141.0
