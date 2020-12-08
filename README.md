@@ -51,3 +51,7 @@ In addition to the above specified,
 
 # Side Note
 The trainer is still in beta so do let me know what you have any suggestions by opening the issue. And also report a issue if it appears.
+
+### Inspiration
+This trainer is inspired from tradingview-trainer by robswc. 
+This trainer has also many more advanced features.
