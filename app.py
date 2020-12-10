@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.font as tkFont
 from session import Session, Position, Trade
-
+import traceback
 
 class App(tk.Frame):
     def __init__(self, master=None):
@@ -532,13 +532,16 @@ class App(tk.Frame):
                 else:
                     self.acc_val_lab.set("Account value: {} -{}".format(self.session.account_value, perc))
             except:
+                print(traceback.format_exc())
                 self.acc_val_lab.set("Error")
         
         if self.session.pause_signal:
             self.playback_running = False
             self.session.pause_signal = False
+        
         if self.playback_running:
             self.after(200, self.routine_task)
+        
         if self.session.check_last_bar():
             self.session.click_pause_play()
             self.playback_running = False

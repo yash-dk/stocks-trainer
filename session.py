@@ -21,13 +21,13 @@ class Session:
             self.driver.get("https://www.tradingview.com/#signin")
         except Exception as e:
             print("Error in chromedriver.")
-            #print(traceback.format_exc(e))
+            print(traceback.format_exc())
 
     def demo(self):
         pass
 
     def show_error(self, exception, message="Report the issue on github."):
-        #print(traceback.format_exc(exception))
+        print(traceback.format_exc())
         messagebox.showerror(str(exception), str(exception)+message)
 
     def get_ohlc(self):
@@ -55,7 +55,7 @@ class Session:
             low = float(low)
             close = float(close)
         except Exception as e:
-            #self.show_error(e)
+            self.show_error(e)
             return None
 
         ohlc["open"] = open_
@@ -351,7 +351,7 @@ class Position:
 
         except Exception as e:
             print("excp", e)
-            #print(traceback.format_exc(e))
+            print(traceback.format_exc())
             pass
 
     def get_value(self):
