@@ -514,14 +514,6 @@ class App(tk.Frame):
             self.low_label.set("Low\n{}".format(ohlc["low"]))
             self.buy_label.set("Buy\n{}".format(ohlc["close"]))
             self.sell_label.set("Sell\n{}".format(ohlc["close"]))
-            try:
-                if self.session.percent_profit >= 0:
-                    perc = round((self.session.percent_profit/100) * self.session.account_value, 3)
-                    self.acc_val_lab.set("Account value: {} +{}".format(self.session.account_value+perc, round(self.session.percent_profit, 3)))
-                else:
-                    self.acc_val_lab.set("Account value: {} -{}".format(self.session.account_value, perc))
-            except:
-                self.acc_val_lab.set("Error")
 
             if self.current_position is not None:
                 self.update_trades()
@@ -533,6 +525,14 @@ class App(tk.Frame):
                 percent = round((self.current_position.get_profit() / self.current_position.invested_amount) * 100, 2)
                 self.position_str.set("{} {} @{} Q.{}\nInv.{} PnL.{} {}%".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.invested_amount , round(self.current_position.get_profit(), 2), percent))
             
+            try:
+                if self.session.percent_profit >= 0:
+                    perc = round((self.session.percent_profit/100) * self.session.account_value, 3)
+                    self.acc_val_lab.set("Account value: {} +{}".format(self.session.account_value+perc, round(self.session.percent_profit, 3)))
+                else:
+                    self.acc_val_lab.set("Account value: {} -{}".format(self.session.account_value, perc))
+            except:
+                self.acc_val_lab.set("Error")
         
         if self.session.pause_signal:
             self.playback_running = False
