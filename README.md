@@ -4,6 +4,10 @@ This is a trainer written in python using tkinter for GUI and selenium for contr
 # Running the trainer
 Download the repo and install the requirements using `pip install -r requirements.txt` then execute the `app.py` using `python app.py`.
 
+# TODO
+ - [ ] Add auto login for tradingview.
+ - [ ] Add the log file of all the trades and positions.
+
 # How to use the trainer
 Step 1: Start the trainer as specified above. Then login in tradingview and open chart from the navbar. `Note: The chart must be open in the same tab where the login screen was opened.`
 
@@ -47,7 +51,7 @@ In addition to the above specified,
 2. There is the OHLC indicater above the orders tabs
 3. Current position its ongoing unrealized Profit and loss the % return you have earned in this position.
 4. Trade history conatins All trades you took in this position specifying which are pending and which are done.
-5. The Account Value is `Work in progress`.
+5. The Account Value value increases with respect to the % profit you earn.
 
 # Side Note
 The trainer is still in beta so do let me know what you have any suggestions by opening the issue. And also report a issue if it appears.
