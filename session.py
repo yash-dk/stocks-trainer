@@ -116,6 +116,8 @@ class Session:
             self.show_error(e)
             return False
 
+    def __del__(self):
+        self.driver.close()
 
 class Trade:
     """This class represents a trade taken by user.
