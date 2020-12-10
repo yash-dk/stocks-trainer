@@ -533,14 +533,15 @@ class App(tk.Frame):
                 percent = round((self.current_position.get_profit() / self.current_position.invested_amount) * 100, 2)
                 self.position_str.set("{} {} @{} Q.{}\nInv.{} PnL.{} {}%".format(typee, self.session.get_name(), self.current_position.get_value(), self.current_position.get_quantity(), self.current_position.invested_amount , round(self.current_position.get_profit(), 2), percent))
             
-        if self.session.check_last_bar():
-            self.session.click_pause_play()
-            self.playback_running = False
+        
         if self.session.pause_signal:
             self.playback_running = False
             self.session.pause_signal = False
         if self.playback_running:
             self.after(200, self.routine_task)
+        if self.session.check_last_bar():
+            self.session.click_pause_play()
+            self.playback_running = False
 
     def update_trades(self):
         if self.current_position is not None:
