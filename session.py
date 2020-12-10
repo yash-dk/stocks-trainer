@@ -12,6 +12,8 @@ class Session:
         self.init_webdriver()
         self.account_start = 100000
         self.account_value = 100000
+        self.percent_profit = 0
+        self.pause_signal = False
 
     def init_webdriver(self):
         try:
@@ -218,7 +220,7 @@ class Position:
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
                     if self.session is not None:
-                        self.session.account_value += self.get_profit()
+                        self.session.percent_profit += (self.get_profit() / self.invested_amount) * 100
                     
                     self.status = False
                     pass
@@ -230,7 +232,7 @@ class Position:
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
                     if self.session is not None:
-                        self.session.account_value += self.get_profit()
+                        self.session.percent_profit += (self.get_profit() / self.invested_amount) * 100
                     
                     self.status = False
                     messagebox.showerror("Oversold", "You sold more quantity then you bought.")
@@ -285,8 +287,7 @@ class Position:
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
                     if self.session is not None:
-                        self.session.account_value += self.get_profit()
-                    
+                        self.session.percent_profit += (self.get_profit() / self.invested_amount) * 100
                     self.status = False
                     pass
                 elif res > 0:
@@ -296,7 +297,7 @@ class Position:
                     self.booked.append([buy_cap, sell_cap])
                     self.shares = []
                     if self.session is not None:
-                        self.session.account_value += self.get_profit()
+                        self.session.percent_profit += (self.get_profit() / self.invested_amount) * 100
                     
                     self.status = False
                     messagebox.showerror("Overbought", "You bought more quantity then you sold.")
@@ -425,8 +426,9 @@ class Position:
                 self.booked.append([buy_cap, sell_cap])
                 self.shares = []
                 if self.session is not None:
-                        self.session.account_value += self.get_profit()
+                        self.session.percent_profit += (self.get_profit() / self.invested_amount) * 100
                         self.session.click_pause_play()
+                        self.session.pause_signal = True
                 
                 self.status = False
                 messagebox.showinfo("Stop Loss","Stop loss hit.")
@@ -439,8 +441,9 @@ class Position:
                 self.booked.append([buy_cap, sell_cap])
                 self.shares = []
                 if self.session is not None:
-                        self.session.account_value += self.get_profit()
+                        self.session.percent_profit += (self.get_profit() / self.invested_amount) * 100
                         self.session.click_pause_play()
+                        self.session.pause_signal = True
                 
                 self.status = False
                 messagebox.showinfo("Profit","Profit booked at take profit.")

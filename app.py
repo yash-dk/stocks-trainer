@@ -515,11 +515,9 @@ class App(tk.Frame):
             self.buy_label.set("Buy\n{}".format(ohlc["close"]))
             self.sell_label.set("Sell\n{}".format(ohlc["close"]))
             try:
-                perc = self.session.account_value / self.session.account_start
-                perc -= 1
-                if perc >= 0:
-                    perc = round(perc*100, 3)
-                    self.acc_val_lab.set("Account value: {} +{}".format(self.session.account_value, perc))
+                if self.session.percent_profit >= 0:
+                    perc = round((self.session.percent_profit/100) * self.session.account_value, 3)
+                    self.acc_val_lab.set("Account value: {} +{}".format(self.session.account_value+perc, self.session.percent_profit))
                 else:
                     self.acc_val_lab.set("Account value: {} -{}".format(self.session.account_value, perc))
             except:
@@ -538,6 +536,9 @@ class App(tk.Frame):
         if self.session.check_last_bar():
             self.session.click_pause_play()
             self.playback_running = False
+        if self.session.pause_signal:
+            self.playback_running = False
+            self.session.pause_signal = False
         if self.playback_running:
             self.after(200, self.routine_task)
 
