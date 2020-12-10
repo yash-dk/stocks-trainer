@@ -517,7 +517,7 @@ class App(tk.Frame):
             try:
                 if self.session.percent_profit >= 0:
                     perc = round((self.session.percent_profit/100) * self.session.account_value, 3)
-                    self.acc_val_lab.set("Account value: {} +{}".format(self.session.account_value+perc, self.session.percent_profit))
+                    self.acc_val_lab.set("Account value: {} +{}".format(self.session.account_value+perc, round(self.session.percent_profit, 3)))
                 else:
                     self.acc_val_lab.set("Account value: {} -{}".format(self.session.account_value, perc))
             except:
